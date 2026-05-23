@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { runPublicWireScan } from "@/lib/local-lens-agent";
+import { runLocalLensScan } from "@/lib/local-lens-agent";
 import { toLocalEditionDemo } from "@/lib/local-lens-edition-adapter";
 
 export async function POST(request: Request) {
@@ -12,7 +12,7 @@ export async function POST(request: Request) {
       ? String(body.requestedTopic).trim()
       : undefined;
 
-    const scan = await runPublicWireScan({ area, slug, focus, requestedTopic });
+    const scan = await runLocalLensScan({ area, slug, focus, requestedTopic });
     const edition = toLocalEditionDemo(scan, slug);
 
     return NextResponse.json({ edition, scan });
