@@ -1,6 +1,7 @@
 import { localSources, publishedBrief, seededChanges } from "./local-lens-data";
 import { logRecallFormRun } from "./clickhouse";
 import { nimbleRunCivicScan } from "./sponsors/nimble-civic";
+import { publishCivicBrief } from "./sponsors/senso-civic";
 
 export async function runLocalLensScan() {
   const sessionId = `scan_${Date.now()}`;
@@ -83,6 +84,10 @@ export async function runLocalLensScan() {
     metrics,
   });
 
+  const sensoPublish = await publishCivicBrief({
+    brief: publishedBrief,
+  });
+
   return {
     sessionId,
     area,
@@ -95,6 +100,7 @@ export async function runLocalLensScan() {
     events,
     metrics,
     clickhouse,
+    publishing: sensoPublish,
     sponsorStack: {
       nimble: {
         provider: "Nimble",
@@ -106,7 +112,7 @@ export async function runLocalLensScan() {
       },
       senso: {
         provider: "Senso / cited.md",
-        role: "Turns verified findings into grounded public civic briefs.",
+        role: `${sensoPublish.mode}: ${sensoPublish.purpose}`,
       },
       googleAgentCli: {
         provider: "Google Agents CLI / ADK",
