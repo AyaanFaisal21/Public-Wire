@@ -96,10 +96,12 @@ export function SearchDialog({ trigger, large = false }: SearchDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger ?? defaultTrigger}</DialogTrigger>
-      <DialogContent className="sm:max-w-[560px] bg-card border-border">
+      <DialogContent className="sm:max-w-[560px] bg-white text-black border border-black/15 rounded-none">
         <DialogHeader>
-          <DialogTitle className="font-display text-3xl">Find your local edition</DialogTitle>
-          <DialogDescription className="text-base">
+          <DialogTitle className="text-3xl md:text-4xl font-bold tracking-tight">
+            Find your local edition
+          </DialogTitle>
+          <DialogDescription className="text-base text-neutral-600">
             LocalLens runs a civic desk for your area. Tell us where you live and what you care about.
           </DialogDescription>
         </DialogHeader>

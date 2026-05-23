@@ -1,6 +1,8 @@
 import { Masthead } from "@/components/landing/masthead";
 import { Colophon } from "@/components/landing/colophon";
+import { LenisProvider } from "@/components/landing/lenis-provider";
 import { LocalEdition } from "@/components/edition/local-edition";
+import { getEditionBySlug } from "@/content/local-lens-demo";
 
 type AreaPageProps = {
   params: Promise<{ area: string }>;
@@ -16,7 +18,8 @@ function prettifyArea(slug: string) {
 
 export async function generateMetadata({ params }: AreaPageProps) {
   const { area } = await params;
-  const pretty = prettifyArea(area);
+  const edition = getEditionBySlug(area);
+  const pretty = edition.area || prettifyArea(area);
   return {
     title: `LocalLens ${pretty} — Today's Civic Briefing`,
     description: `Self-running civic newsroom for ${pretty}. Agent-monitored. Source-cited. Mentor-reviewed.`,
@@ -27,12 +30,13 @@ export default async function AreaPage({ params, searchParams }: AreaPageProps) 
   const { area } = await params;
   const { focus } = await searchParams;
   const focusList = focus ? focus.split(",") : [];
-  const pretty = prettifyArea(area);
+  const pretty = getEditionBySlug(area).area || prettifyArea(area);
 
   return (
     <>
-      <Masthead />
-      <main className="relative">
+      <LenisProvider />
+      <Masthead variant="solid" />
+      <main>
         <LocalEdition areaSlug={area} areaName={pretty} focus={focusList} />
       </main>
       <Colophon />

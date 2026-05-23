@@ -1,3 +1,9 @@
+"use client";
+
+import Image from "next/image";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
+
 const AGENTS = [
   { name: "Area Mapper", role: "Resolves a search into the right civic layers — state, county, city, neighborhood, campus, services." },
   { name: "Source Scout", role: "Finds and validates official and public sources for the area." },
@@ -5,56 +11,85 @@ const AGENTS = [
   { name: "Extractor", role: "Turns hostile civic web pages and PDFs into structured civic events." },
   { name: "Change Detector", role: "Diffs current snapshots against memory. Knows what is new, stale, duplicate, or updated." },
   { name: "Editor", role: "Filters routine administrative noise. Keeps what affects residents." },
-  { name: "Verifier", role: "Checks each claim against source text. Assigns confidence." },
+  { name: "Verifier", role: "Checks each claim against source text and blocks unsupported wording." },
   { name: "Writer", role: "Drafts the brief from verified facts only. Never invents." },
-  { name: "Mentor", role: "Reviews the reporting agents&apos; work — sources, claims, behavior — before publication." },
+  { name: "Mentor", role: "Reviews the reporting agents’ work — sources, claims, behavior — before publication.", reviewer: true },
   { name: "Publisher", role: "Posts approved briefs to the LocalLens edition and to the public cited artifact." },
-  { name: "Audit Translator", role: "Turns raw agent traces into the plain-English &ldquo;how this story was made&rdquo; log." },
+  { name: "Audit Translator", role: "Turns raw agent traces into the plain-English “how this story was made” log." },
   { name: "Update Agent", role: "Keeps published briefs current as sources change after publication." },
 ];
 
 export function AgentSwarm() {
-  return (
-    <section id="agents" className="relative border-t border-border bg-card/40 paper-grain">
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-12 py-24 lg:py-32 relative z-10">
-        <div className="flex items-center gap-3 mb-10">
-          <span className="text-xs font-mono uppercase tracking-[0.22em] text-muted-foreground">§ 03</span>
-          <span className="rule flex-1 max-w-[180px]" />
-          <span className="text-xs font-mono uppercase tracking-[0.22em] text-muted-foreground">The swarm</span>
-        </div>
+  const container = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: container,
+    offset: ["start end", "end start"],
+  });
+  const y = useTransform(scrollYProgress, [0, 1], ["-10vh", "10vh"]);
 
-        <div className="grid lg:grid-cols-[1fr_1.4fr] gap-10 lg:gap-16 mb-16">
-          <h2 className="font-display text-4xl lg:text-6xl leading-[0.95] tracking-tight">
-            Twelve narrow agents.<br />
-            <span className="italic text-muted-foreground">One reviewable chain.</span>
-          </h2>
-          <p className="text-lg text-foreground/80 leading-relaxed">
-            One large agent that searches, reasons, writes, verifies, and publishes
-            tends to hallucinate. So we don&apos;t use one. Each part of the workflow
-            is a small agent with a smaller context, a narrower job, and an
-            output that the next agent — or a human — can check.
+  return (
+    <section
+      ref={container}
+      id="agents"
+      className="relative overflow-hidden min-h-screen py-24 md:py-32 flex items-center"
+      style={{ clipPath: "polygon(0% 0, 100% 0%, 100% 100%, 0 100%)" }}
+    >
+      <div className="fixed top-[-10vh] left-0 h-[120vh] w-full">
+        <motion.div style={{ y }} className="relative w-full h-full">
+          <Image
+            src="/images/spiral-circles.jpg"
+            fill
+            alt="Abstract spiral network behind newsroom agents"
+            style={{ objectFit: "cover" }}
+            className="brightness-[0.38] grayscale"
+          />
+        </motion.div>
+      </div>
+      <div className="absolute inset-0 bg-black/35" />
+
+      <div className="relative z-10 max-w-[1400px] mx-auto px-6 md:px-10 text-white">
+        <div className="grid lg:grid-cols-[1fr_1.3fr] gap-10 lg:gap-20 mb-16">
+          <div>
+            <h3 className="uppercase mb-6 text-xs md:text-sm tracking-[0.22em] text-neutral-300">
+              § 06 — The newsroom
+            </h3>
+            <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-[0.92] tracking-tight text-balance">
+              Twelve different agents.<br />Twelve newsroom jobs.
+            </h2>
+          </div>
+          <p className="text-lg md:text-2xl text-neutral-200 leading-snug font-light text-balance self-end max-w-2xl">
+            LocalLens treats the swarm like a small civic newsroom: one agent scouts,
+            one watches sources, one verifies, one writes, and one acts like a public
+            editor. They behave like different employees at a press desk, each with a
+            narrow job and a handoff the next person can inspect.
           </p>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-border ink-shadow">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-white/30 border border-white/30">
           {AGENTS.map((agent, idx) => (
-            <div key={agent.name} className="bg-background p-6">
+            <motion.div
+              key={agent.name}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.5, delay: (idx % 6) * 0.04, ease: [0.22, 1, 0.36, 1] }}
+              className="bg-black/60 backdrop-blur-sm p-6 md:p-7 group hover:bg-white hover:text-black transition-colors duration-500"
+            >
               <div className="flex items-baseline justify-between mb-2">
-                <span className="font-mono text-[0.7rem] uppercase tracking-[0.18em] text-muted-foreground">
+                <span className="text-[0.7rem] uppercase tracking-[0.18em] text-neutral-400 group-hover:text-neutral-600 transition-colors">
                   Agent {String(idx + 1).padStart(2, "0")}
                 </span>
-                {idx === 8 && (
-                  <span className="font-mono text-[0.6rem] uppercase tracking-[0.15em] px-1.5 py-0.5 rounded bg-foreground text-background">
+                {agent.reviewer && (
+                  <span className="text-[0.6rem] uppercase tracking-[0.15em] px-1.5 py-0.5 bg-white text-black group-hover:bg-black group-hover:text-white transition-colors">
                     Reviewer
                   </span>
                 )}
               </div>
-              <h3 className="font-display text-2xl mb-2">{agent.name}</h3>
-              <p
-                className="text-sm text-foreground/70 leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: agent.role }}
-              />
-            </div>
+              <h3 className="text-2xl md:text-3xl font-bold mb-2">{agent.name}</h3>
+              <p className="text-sm text-neutral-300 group-hover:text-neutral-700 transition-colors leading-relaxed">
+                {agent.role}
+              </p>
+            </motion.div>
           ))}
         </div>
       </div>

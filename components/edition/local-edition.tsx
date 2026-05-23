@@ -1,66 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Loader2, RefreshCcw } from "lucide-react";
-
-type ScanResult = {
-  sessionId: string;
-  area: string;
-  lastChecked: string;
-  sources: Array<{
-    id: string;
-    name: string;
-    url: string;
-    category: string;
-    sourceType: string;
-  }>;
-  changes: Array<{
-    id: string;
-    title: string;
-    category: string;
-    status: string;
-    importance: string;
-    whatChanged: string;
-    whyItMatters: string;
-    whoIsAffected: string[];
-    evidence: string[];
-    rejectionReason?: string;
-  }>;
-  published: ScanResult["changes"];
-  rejected: ScanResult["changes"];
-  brief: {
-    id: string;
-    headline: string;
-    area: string;
-    category: string;
-    confidence: string;
-    status: string;
-    summary: string;
-    whyItMatters: string;
-    whoIsAffected: string[];
-    sources: { title: string; url: string; role: string }[];
-    agentTrace: string[];
-  };
-  events: Array<{
-    step: number;
-    title: string;
-    detail: string;
-    source: string;
-    risk: string;
-    status: string;
-  }>;
-  metrics: Record<string, number>;
-  clickhouse: { enabled: boolean; message?: string; reason?: string };
-  publishing?: {
-    provider: string;
-    mode: string;
-    purpose: string;
-    publishedUrl?: string;
-    citationId?: string;
-  };
-  sponsorStack: Record<string, { provider: string; role: string }>;
-};
+import { useState } from "react";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { ArrowUpRight, ExternalLink, Newspaper, SearchCheck, Send } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { type CivicBrief, getEditionBySlug } from "@/content/local-lens-demo";
 
 type Props = {
   areaSlug: string;
@@ -68,73 +19,69 @@ type Props = {
   focus: string[];
 };
 
-function readableKey(key: string) {
-  return key.replace(/([A-Z])/g, " $1").replace(/^./, (c) => c.toUpperCase());
-}
-
 export function LocalEdition({ areaSlug, areaName, focus }: Props) {
-  const [data, setData] = useState<ScanResult | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  async function load() {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch("/api/local-lens/scan", { method: "POST" });
-      if (!res.ok) throw new Error(`Scan failed: ${res.status}`);
-      const json = (await res.json()) as ScanResult;
-      setData(json);
-    } catch (err) {
-      setError(String(err));
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const edition = getEditionBySlug(areaSlug);
+  const topBrief = edition.briefs[0];
+  const [selectedBrief, setSelectedBrief] = useState<CivicBrief | null>(null);
+  const [requestOpen, setRequestOpen] = useState(false);
+  const [requestSubmitted, setRequestSubmitted] = useState(false);
 
   return (
-    <div className="paper-grain">
-      {/* Edition masthead */}
-      <section className="relative border-b border-border">
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-12 pt-14 pb-10">
-          <div className="flex items-baseline gap-3 mb-6 text-xs font-mono uppercase tracking-[0.22em] text-muted-foreground">
-            <span>LocalLens {areaName}</span>
-            <span className="rule flex-1 max-w-[200px]" />
-            <span>
-              {new Date().toLocaleDateString("en-US", {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </span>
+    <div className="bg-white text-black">
+      <section className="border-b border-black/10">
+        <div className="max-w-[1400px] mx-auto px-6 md:px-10 pt-16 md:pt-20 pb-12">
+          <div className="flex items-baseline gap-3 mb-8 text-[0.7rem] md:text-xs uppercase tracking-[0.22em] text-neutral-500">
+            <span>LocalLens {edition.area || areaName}</span>
+            <span className="flex-1 h-px bg-black/15 max-w-[200px]" />
+            <span>Live demo edition</span>
           </div>
 
-          <h1 className="font-display text-5xl lg:text-7xl leading-[0.95] tracking-tight mb-3">
-            Today&apos;s Civic Briefing
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-3xl">
-            {data ? (
-              <>Last checked {data.lastChecked} · {data.sources.length} sources monitored · {data.published.length} meaningful updates · {data.rejected.length} routine items filtered.</>
-            ) : (
-              <>The desk is opening this edition…</>
-            )}
-          </p>
+          <div className="grid lg:grid-cols-[1fr_380px] gap-8 lg:gap-14 items-end">
+            <div>
+              <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold leading-[0.92] tracking-tight mb-4 text-balance">
+                Today&apos;s Civic Briefing
+              </h1>
+              <p className="text-base md:text-lg text-neutral-600 max-w-3xl">
+                Last checked {edition.lastChecked} · {edition.metrics.sourcesMonitored} source
+                surfaces scanned · {edition.metrics.meaningfulUpdates} meaningful updates ·{" "}
+                {edition.metrics.routineItemsRejected} routine items filtered.
+              </p>
+            </div>
+
+            <div className="border border-black/10 bg-neutral-50 p-5">
+              <div className="text-[0.65rem] uppercase tracking-[0.2em] text-neutral-500 mb-3">
+                Edition queue
+              </div>
+              <ol className="space-y-3">
+                {edition.briefs.map((brief, index) => (
+                  <li key={brief.id} className="grid grid-cols-[58px_1fr] gap-3">
+                    <div className="font-mono text-xs text-neutral-500">{brief.displayTime}</div>
+                    <div>
+                      <div className="flex flex-wrap gap-2 mb-1">
+                        <span className="text-[0.58rem] uppercase tracking-[0.14em] px-1.5 py-0.5 bg-black text-white">
+                          {index === 0 ? "Lead" : brief.sortLabel}
+                        </span>
+                        <span className="text-[0.58rem] uppercase tracking-[0.14em] px-1.5 py-0.5 border border-black/20">
+                          {brief.impactLabel}
+                        </span>
+                      </div>
+                      <p className="text-xs text-neutral-700 leading-relaxed">{brief.priorityReason}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </div>
 
           {focus.length > 0 && (
-            <div className="mt-4 flex flex-wrap gap-2">
-              <span className="text-[0.65rem] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+            <div className="mt-4 flex flex-wrap gap-2 items-center">
+              <span className="text-[0.65rem] uppercase tracking-[0.22em] text-neutral-500">
                 Focused on:
               </span>
               {focus.map((f) => (
                 <span
                   key={f}
-                  className="text-[0.65rem] font-mono uppercase tracking-[0.15em] px-2 py-1 rounded-full border border-border"
+                  className="text-[0.65rem] uppercase tracking-[0.15em] px-2 py-1 border border-black/20"
                 >
                   {f.replace(/-/g, " ")}
                 </span>
@@ -142,323 +89,506 @@ export function LocalEdition({ areaSlug, areaName, focus }: Props) {
             </div>
           )}
 
-          <div className="mt-8 flex gap-3">
-            <Button
-              onClick={load}
-              disabled={loading}
-              className="rounded-full bg-foreground hover:bg-foreground/90 text-background"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="size-4 animate-spin" /> Running desk…
-                </>
-              ) : (
-                <>
-                  <RefreshCcw className="size-4" /> Run another scan
-                </>
-              )}
-            </Button>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <button type="button" onClick={() => setSelectedBrief(topBrief)} className="btn-solid-dark">
+              <SearchCheck className="size-4" /> Investigate top brief
+            </button>
+            <button type="button" onClick={() => setRequestOpen(true)} className="btn-outline-dark">
+              <Send className="size-4" /> News you want to see
+            </button>
+            <Link href={`/briefs/${topBrief.slug}`} className="btn-outline-dark">
+              <Newspaper className="size-4" /> Open top brief
+            </Link>
           </div>
         </div>
       </section>
 
-      {error && (
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-12 py-8">
-          <div className="border border-destructive/40 bg-destructive/5 text-destructive p-4 rounded-md text-sm">
-            {error}
+      <section className="border-b border-black/10 bg-black text-white">
+        <div className="max-w-[1400px] mx-auto px-6 md:px-10 py-10 grid grid-cols-2 md:grid-cols-4 gap-px bg-white/15 border border-white/15">
+          <Metric value={edition.metrics.sourcesMonitored} label="Source surfaces" />
+          <Metric value={edition.metrics.meaningfulUpdates} label="Meaningful updates" />
+          <Metric value={edition.metrics.routineItemsRejected} label="Routine filtered" />
+          <Metric value={edition.metrics.civicLayers} label="Civic layers" />
+        </div>
+      </section>
+
+      <section className="border-b border-black/10">
+        <div className="max-w-[1400px] mx-auto px-6 md:px-10 py-16">
+          <SectionLabel label="Top story" />
+
+          <div className="grid lg:grid-cols-[1.4fr_1fr] gap-px bg-black/10 border border-black/10">
+            <motion.article
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              className="bg-white p-8 md:p-12"
+            >
+              <BriefKicker
+                verificationStatus={topBrief.verificationStatus}
+                category={topBrief.category}
+                status={topBrief.status}
+              />
+              <h2 className="text-3xl md:text-5xl font-bold leading-[1.02] tracking-tight mb-6 text-balance">
+                {topBrief.headline}
+              </h2>
+              <p className="text-lg md:text-xl text-neutral-700 leading-relaxed mb-6 font-light">
+                {topBrief.summary}
+              </p>
+
+              <div className="grid sm:grid-cols-2 gap-6 mb-6">
+                <DetailBlock title="Why it matters" body={topBrief.whyItMatters} />
+                <DetailBlock title="Who is affected" body={topBrief.whoIsAffected.join(" · ")} />
+              </div>
+
+              <div className="flex flex-wrap gap-3">
+                <Link href={`/briefs/${topBrief.slug}`} className="btn-solid-dark">
+                  Read full trust layer <ArrowUpRight className="size-4" />
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => setSelectedBrief(topBrief)}
+                  className="btn-outline-dark"
+                >
+                  <SearchCheck className="size-4" /> Investigate agent work
+                </button>
+              </div>
+            </motion.article>
+
+            <motion.aside
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+              className="bg-black text-white p-8 md:p-10"
+            >
+              <div className="text-[0.7rem] uppercase tracking-[0.22em] text-neutral-400 mb-4">
+                Agent audit log
+              </div>
+              <ol className="space-y-3">
+                {topBrief.auditLog.slice(0, 6).map((line, i) => (
+                  <li key={line} className="flex gap-3 text-sm text-neutral-200 leading-relaxed">
+                    <span className="text-xs text-neutral-500 shrink-0 pt-0.5">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <span>{line}</span>
+                  </li>
+                ))}
+              </ol>
+              <div className="mt-8 pt-6 border-t border-white/15">
+                <div className="text-[0.7rem] uppercase tracking-[0.22em] text-neutral-400 mb-2">
+                  Mentor review
+                </div>
+                <p className="text-sm text-neutral-200 leading-relaxed">{topBrief.mentorReview}</p>
+              </div>
+            </motion.aside>
           </div>
         </div>
-      )}
+      </section>
 
-      {!data && loading && (
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-12 py-20 text-center">
-          <Loader2 className="size-6 animate-spin mx-auto mb-4 text-muted-foreground" />
-          <p className="text-sm text-muted-foreground font-mono uppercase tracking-[0.18em]">
-            Civic agents are scanning {areaName}…
-          </p>
-        </div>
-      )}
-
-      {data && (
-        <>
-          {/* Metrics strip */}
-          <section className="border-b border-border bg-card/40">
-            <div className="max-w-[1400px] mx-auto px-6 lg:px-12 py-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-px bg-border">
-              {Object.entries(data.metrics).map(([k, v]) => (
-                <div key={k} className="bg-card p-4">
-                  <div className="font-display text-3xl">{v}</div>
-                  <div className="font-mono text-[0.65rem] uppercase tracking-[0.15em] text-muted-foreground mt-1">
-                    {readableKey(k)}
+      <section className="border-b border-black/10 bg-neutral-50">
+        <div className="max-w-[1400px] mx-auto px-6 md:px-10 py-16 grid lg:grid-cols-[1.3fr_1fr] gap-10">
+          <div>
+            <SectionLabel label="Also today" />
+            <div className="space-y-4">
+              {edition.briefs.map((brief) => (
+                <article key={brief.id} className="bg-white border border-black/10 p-5">
+                  <BriefKicker
+                    verificationStatus={brief.verificationStatus}
+                    category={brief.category}
+                    status={brief.status}
+                  />
+                  <div className="mb-3 flex flex-wrap items-center gap-2 text-[0.65rem] uppercase tracking-[0.15em] text-neutral-500">
+                    <span>{brief.displayTime}</span>
+                    <span className="h-px w-6 bg-black/20" />
+                    <span>{brief.sortLabel}</span>
+                    <span className="h-px w-6 bg-black/20" />
+                    <span>{brief.impactLabel}</span>
                   </div>
+                  <h3 className="text-xl md:text-2xl font-bold leading-tight mb-2">
+                    <Link href={`/briefs/${brief.slug}`} className="hover:underline">
+                      {brief.headline}
+                    </Link>
+                  </h3>
+                  <p className="text-sm text-neutral-700 mb-1">
+                    <strong>What changed: </strong>
+                    {brief.whatChanged}
+                  </p>
+                  <p className="text-sm text-neutral-700">
+                    <strong>Why it matters: </strong>
+                    {brief.whyItMatters}
+                  </p>
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedBrief(brief)}
+                      className="btn-outline-dark"
+                    >
+                      <SearchCheck className="size-4" /> Investigate
+                    </button>
+                    <Link href={`/briefs/${brief.slug}`} className="btn-solid-dark">
+                      Open brief <ArrowUpRight className="size-4" />
+                    </Link>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+
+          <aside>
+            <SectionLabel label="Filtered & requested" compact />
+            <div className="mb-4 border border-black bg-white p-4">
+              <div className="text-[0.65rem] uppercase tracking-[0.18em] text-neutral-500 mb-2">
+                Want something covered?
+              </div>
+              <p className="text-sm text-neutral-700 leading-relaxed mb-4">
+                Submit a topic and the agents check whether it can be covered with public,
+                source-backed evidence. Repeated requests raise priority, but unsupported
+                claims still do not publish.
+              </p>
+              <button type="button" onClick={() => setRequestOpen(true)} className="btn-solid-dark">
+                <Send className="size-4" /> Request coverage
+              </button>
+            </div>
+            <div className="space-y-3">
+              {edition.rejectedItems.map((item) => (
+                <div key={item.title} className="bg-white border border-black/10 p-4">
+                  <div className="text-sm font-medium mb-1">{item.title}</div>
+                  <div className="text-[0.65rem] uppercase tracking-[0.15em] text-neutral-500 mb-2">
+                    {item.source}
+                  </div>
+                  <p className="text-xs text-neutral-500">{item.reason}</p>
                 </div>
               ))}
             </div>
-          </section>
+          </aside>
+        </div>
+      </section>
 
-          {/* Top story */}
-          <section className="border-b border-border">
-            <div className="max-w-[1400px] mx-auto px-6 lg:px-12 py-14">
-              <div className="flex items-center gap-3 mb-8">
-                <span className="text-xs font-mono uppercase tracking-[0.22em] text-muted-foreground">
-                  Top story
-                </span>
-                <span className="rule flex-1 max-w-[200px]" />
+      <section className="border-b border-black/10 bg-neutral-50">
+        <div className="max-w-[1400px] mx-auto px-6 md:px-10 py-16">
+          <div>
+            <SectionLabel label="Representative source families" compact />
+            <p className="mb-6 max-w-3xl text-sm leading-relaxed text-neutral-600">
+              The scanner counts individual source surfaces: pages, agendas, PDF indexes,
+              alert feeds, calendars, and notice boards. These cards show the main source
+              families behind that larger scan.
+            </p>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {edition.sources.map((source) => (
+                <div key={source.id} className="bg-white border border-black/10 p-4">
+                  <div className="font-medium">{source.name}</div>
+                  <div className="text-[0.65rem] uppercase tracking-[0.15em] text-neutral-500 mt-1">
+                    {source.level} · {source.category} · {source.sourceType}
+                  </div>
+                  <div className="text-xs text-neutral-500 truncate mt-1">{source.url}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16 text-center">
+        <p className="text-xs uppercase tracking-[0.22em] text-neutral-500">
+          End of edition · {areaSlug} · frontend demo content
+        </p>
+      </section>
+
+      <InvestigationDialog brief={selectedBrief} onOpenChange={(open) => !open && setSelectedBrief(null)} />
+      <CoverageRequestDialog
+        area={edition.area}
+        open={requestOpen}
+        submitted={requestSubmitted}
+        onSubmit={() => setRequestSubmitted(true)}
+        onOpenChange={(open) => {
+          setRequestOpen(open);
+          if (!open) setRequestSubmitted(false);
+        }}
+      />
+    </div>
+  );
+}
+
+function CoverageRequestDialog({
+  area,
+  open,
+  submitted,
+  onSubmit,
+  onOpenChange,
+}: {
+  area: string;
+  open: boolean;
+  submitted: boolean;
+  onSubmit: () => void;
+  onOpenChange: (open: boolean) => void;
+}) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="rounded-none border-black bg-white text-black sm:max-w-[720px]">
+        <DialogHeader>
+          <div className="text-[0.65rem] uppercase tracking-[0.2em] text-neutral-500">
+            News you want to see
+          </div>
+          <DialogTitle className="text-3xl md:text-4xl font-bold tracking-tight">
+            Ask the {area} desk to investigate a topic.
+          </DialogTitle>
+          <DialogDescription className="text-base text-neutral-600">
+            Reader demand can focus the agents, but publication still depends on
+            official or public source support.
+          </DialogDescription>
+        </DialogHeader>
+
+        {submitted ? (
+          <div className="border border-black bg-neutral-50 p-5">
+            <div className="text-[0.65rem] uppercase tracking-[0.18em] text-neutral-500 mb-2">
+              Request queued
+            </div>
+            <p className="text-sm text-neutral-800 leading-relaxed">
+              The Source Scout would now look for official notices, meeting records,
+              agency pages, public calendars, permit databases, alerts, or cited public
+              artifacts. If enough residents ask and the evidence exists, the topic can
+              move into the edition queue.
+            </p>
+          </div>
+        ) : (
+          <form
+            className="space-y-4"
+            onSubmit={(event) => {
+              event.preventDefault();
+              onSubmit();
+            }}
+          >
+            <label className="block">
+              <span className="mb-2 block text-[0.65rem] uppercase tracking-[0.18em] text-neutral-500">
+                Topic or claim
+              </span>
+              <textarea
+                className="min-h-28 w-full border border-black/20 bg-white p-3 text-sm outline-none focus:border-black"
+                placeholder="Example: Are there planned bus stop changes near College Ave next week?"
+              />
+            </label>
+            <label className="block">
+              <span className="mb-2 block text-[0.65rem] uppercase tracking-[0.18em] text-neutral-500">
+                Optional source or place to check
+              </span>
+              <input
+                className="w-full border border-black/20 bg-white p-3 text-sm outline-none focus:border-black"
+                placeholder="Agency page, agenda, PDF, public post, address, or source name"
+              />
+            </label>
+            <div className="grid gap-3 border border-black/10 bg-neutral-50 p-4 text-sm text-neutral-700 md:grid-cols-3">
+              <div>
+                <strong className="block text-black">1. Source scout</strong>
+                Looks for official or public evidence.
               </div>
-
-              <div className="grid lg:grid-cols-[1.4fr_1fr] gap-px bg-border ink-shadow">
-                <article className="bg-background p-8 lg:p-12">
-                  <div className="flex flex-wrap gap-2 mb-5">
-                    <span className="text-[0.65rem] font-mono uppercase tracking-[0.15em] px-2 py-1 rounded-full border border-foreground/60 bg-foreground text-background">
-                      {data.brief.confidence} confidence
-                    </span>
-                    <span className="text-[0.65rem] font-mono uppercase tracking-[0.15em] px-2 py-1 rounded-full border border-border">
-                      {data.brief.category}
-                    </span>
-                    <span className="text-[0.65rem] font-mono uppercase tracking-[0.15em] px-2 py-1 rounded-full border border-border">
-                      {data.brief.status}
-                    </span>
-                  </div>
-
-                  <h2 className="font-display text-3xl lg:text-5xl leading-[1.02] tracking-tight mb-6">
-                    {data.brief.headline}
-                  </h2>
-
-                  <p className="text-lg text-foreground/80 leading-relaxed mb-6">
-                    {data.brief.summary}
-                  </p>
-
-                  <div className="grid sm:grid-cols-2 gap-6 mb-6">
-                    <div className="border-t border-border pt-3">
-                      <div className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground mb-1">
-                        Why it matters
-                      </div>
-                      <p className="text-sm text-foreground/80">{data.brief.whyItMatters}</p>
-                    </div>
-                    <div className="border-t border-border pt-3">
-                      <div className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground mb-1">
-                        Who is affected
-                      </div>
-                      <p className="text-sm text-foreground/80">
-                        {data.brief.whoIsAffected.join(" · ")}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="border-t border-border pt-4">
-                    <div className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground mb-3">
-                      Sources used
-                    </div>
-                    <div className="space-y-3">
-                      {data.brief.sources.map((s) => (
-                        <div key={s.title} className="flex flex-col">
-                          <a
-                            href={s.url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-sm font-medium hover:underline"
-                          >
-                            {s.title}
-                          </a>
-                          <span className="text-xs text-muted-foreground">{s.role}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </article>
-
-                <aside className="bg-card p-8 lg:p-10">
-                  <div className="font-mono text-[0.7rem] uppercase tracking-[0.22em] text-muted-foreground mb-4">
-                    Agent audit log
-                  </div>
-                  <ol className="space-y-3">
-                    {data.brief.agentTrace.map((line, i) => (
-                      <li key={i} className="flex gap-3 text-sm text-foreground/80 leading-relaxed">
-                        <span className="font-mono text-xs text-muted-foreground shrink-0 pt-0.5">
-                          {String(i + 1).padStart(2, "0")}
-                        </span>
-                        <span>{line}</span>
-                      </li>
-                    ))}
-                  </ol>
-
-                  {data.publishing && (
-                    <div className="mt-8 pt-6 border-t border-border">
-                      <div className="font-mono text-[0.7rem] uppercase tracking-[0.22em] text-muted-foreground mb-2">
-                        Published artifact
-                      </div>
-                      <p className="text-sm text-foreground/85 mb-2">
-                        {data.publishing.provider} · <span className="font-mono text-xs">{data.publishing.mode}</span>
-                      </p>
-                      {data.publishing.publishedUrl && (
-                        <a
-                          href={data.publishing.publishedUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-xs underline text-muted-foreground hover:text-foreground"
-                        >
-                          {data.publishing.publishedUrl}
-                        </a>
-                      )}
-                    </div>
-                  )}
-                </aside>
+              <div>
+                <strong className="block text-black">2. Volume check</strong>
+                Repeated requests raise priority.
+              </div>
+              <div>
+                <strong className="block text-black">3. Publish test</strong>
+                No source support means no brief.
               </div>
             </div>
-          </section>
+            <button type="submit" className="btn-solid-dark">
+              <Send className="size-4" /> Queue topic check
+            </button>
+          </form>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
 
-          {/* Other updates + rejected */}
-          <section className="border-b border-border bg-card/40">
-            <div className="max-w-[1400px] mx-auto px-6 lg:px-12 py-14 grid lg:grid-cols-[1.3fr_1fr] gap-10">
-              <div>
-                <div className="flex items-center gap-3 mb-6">
-                  <span className="text-xs font-mono uppercase tracking-[0.22em] text-muted-foreground">
-                    Also today
-                  </span>
-                  <span className="rule flex-1 max-w-[200px]" />
+function InvestigationDialog({
+  brief,
+  onOpenChange,
+}: {
+  brief: CivicBrief | null;
+  onOpenChange: (open: boolean) => void;
+}) {
+  return (
+    <Dialog open={Boolean(brief)} onOpenChange={onOpenChange}>
+      <DialogContent
+        data-lenis-prevent=""
+        data-lenis-prevent-touch=""
+        data-lenis-prevent-wheel=""
+        className="!flex h-[90dvh] max-h-[90dvh] min-h-0 !flex-col !gap-0 overflow-hidden rounded-none border-black bg-white !p-0 text-black sm:!max-w-[1040px]"
+      >
+        {brief && (
+          <>
+            <DialogHeader className="shrink-0 border-b border-black/10 p-6 pr-12 md:p-8 md:pr-14">
+              <div className="text-[0.65rem] uppercase tracking-[0.2em] text-neutral-500">
+                Agent console · reader investigation
+              </div>
+              <DialogTitle className="text-3xl md:text-5xl font-bold tracking-tight leading-[1] max-w-3xl">
+                {brief.headline}
+              </DialogTitle>
+              <DialogDescription className="text-base text-neutral-600 max-w-2xl">
+                Opened because a reader wanted to inspect how this entry was sourced,
+                verified, reviewed, and published.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div
+              data-lenis-prevent=""
+              data-lenis-prevent-touch=""
+              data-lenis-prevent-wheel=""
+              className="min-h-0 flex-1 overflow-y-auto overscroll-contain"
+            >
+            <div className="grid lg:grid-cols-[1.3fr_0.9fr] gap-px bg-black/10">
+              <div className="bg-white p-6 md:p-8">
+                <div className="text-[0.65rem] uppercase tracking-[0.2em] text-neutral-500 mb-5">
+                  Trace timeline
                 </div>
-                <div className="space-y-4">
-                  {data.published.map((change) => (
-                    <article
-                      key={change.id}
-                      className="bg-background border border-border p-5 ink-shadow"
+                <ol className="space-y-3">
+                  {brief.investigationTrace.map((event) => (
+                    <li
+                      key={`${event.time}-${event.agent}`}
+                      className={`grid gap-3 border p-4 sm:grid-cols-[78px_150px_1fr] ${
+                        event.status === "needs-evidence" || event.status === "resent"
+                          ? "border-amber-500 bg-amber-50"
+                          : "border-black/10 bg-white"
+                      }`}
                     >
-                      <div className="flex flex-wrap gap-2 mb-2">
-                        <span className="text-[0.6rem] font-mono uppercase tracking-[0.15em] px-2 py-0.5 rounded-full border border-border">
-                          {change.category}
+                      <span className="text-xs font-mono text-neutral-500">{event.time}</span>
+                      <span className="text-sm font-bold">{event.agent}</span>
+                      <span className="text-sm text-neutral-700 leading-relaxed">
+                        <span
+                          className={`mr-2 inline-flex px-2 py-0.5 text-[0.6rem] uppercase tracking-[0.14em] ${
+                            event.status === "needs-evidence" || event.status === "resent"
+                              ? "bg-amber-500 text-black"
+                              : event.status === "published"
+                                ? "bg-black text-white"
+                                : "border border-black/20 text-black"
+                          }`}
+                        >
+                          {event.status === "resent" ? "↩ resend" : event.status.replace("-", " ")}
                         </span>
-                        <span className="text-[0.6rem] font-mono uppercase tracking-[0.15em] px-2 py-0.5 rounded-full border border-border">
-                          {change.importance}
-                        </span>
-                      </div>
-                      <h3 className="font-display text-2xl leading-tight mb-2">{change.title}</h3>
-                      <p className="text-sm text-foreground/75 mb-1">
-                        <strong>What changed: </strong>{change.whatChanged}
-                      </p>
-                      <p className="text-sm text-foreground/75">
-                        <strong>Why it matters: </strong>{change.whyItMatters}
-                      </p>
-                    </article>
+                        {event.detail}
+                        {event.query && (
+                          <span className="mt-3 block border-l border-black/20 pl-3 italic text-neutral-500">
+                            “{event.query}”
+                          </span>
+                        )}
+                      </span>
+                    </li>
                   ))}
-                </div>
+                </ol>
               </div>
 
-              <aside>
-                <div className="flex items-center gap-3 mb-6">
-                  <span className="text-xs font-mono uppercase tracking-[0.22em] text-muted-foreground">
-                    Rejected
-                  </span>
-                  <span className="rule flex-1 max-w-[120px]" />
+              <aside className="bg-black p-6 md:p-8 text-white">
+                <div className="text-[0.65rem] uppercase tracking-[0.2em] text-neutral-400 mb-5">
+                  Evidence packet
                 </div>
-                <div className="space-y-3">
-                  {data.rejected.map((change) => (
-                    <div
-                      key={change.id}
-                      className="bg-background border border-border p-4 ink-shadow"
-                    >
-                      <div className="text-sm font-medium mb-1">{change.title}</div>
-                      <p className="text-xs text-muted-foreground">
-                        {change.rejectionReason}
-                      </p>
+                <div className="space-y-4">
+                  {brief.sources.map((source) => (
+                    <div key={source.title} className="border border-white/15 p-4">
+                      <a
+                        href={source.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-2 text-sm font-bold hover:underline"
+                      >
+                        {source.title} <ExternalLink className="size-4" />
+                      </a>
+                      <p className="mt-2 text-xs leading-relaxed text-neutral-400">{source.role}</p>
                     </div>
                   ))}
+                </div>
+
+                <div className="mt-8 border-t border-white/15 pt-6">
+                  <div className="text-[0.65rem] uppercase tracking-[0.2em] text-neutral-400 mb-3">
+                    Mentor review
+                  </div>
+                  <p className="text-sm leading-relaxed text-neutral-200">{brief.mentorReview}</p>
+                </div>
+
+                <div className="mt-8 border-t border-white/15 pt-6">
+                  <div className="text-[0.65rem] uppercase tracking-[0.2em] text-neutral-400 mb-3">
+                    Public artifact
+                  </div>
+                  <p className="text-sm text-neutral-200">{brief.artifactLabel}</p>
+                </div>
+
+                <div className="mt-8 border-t border-white/15 pt-6">
+                  <div className="text-[0.65rem] uppercase tracking-[0.2em] text-neutral-400 mb-3">
+                    Technical scoring
+                  </div>
+                  <div className="space-y-2">
+                    {brief.investigationTrace
+                      .filter((event) => event.technicalConfidence)
+                      .map((event) => (
+                        <p key={`${event.time}-${event.technicalConfidence}`} className="text-xs text-neutral-300">
+                          {event.agent}: {event.technicalConfidence}
+                        </p>
+                      ))}
+                  </div>
                 </div>
               </aside>
             </div>
-          </section>
-
-          {/* Agent console */}
-          <section className="border-b border-border">
-            <div className="max-w-[1400px] mx-auto px-6 lg:px-12 py-14">
-              <div className="flex items-center gap-3 mb-6">
-                <span className="text-xs font-mono uppercase tracking-[0.22em] text-muted-foreground">
-                  Agent console
-                </span>
-                <span className="rule flex-1 max-w-[200px]" />
-              </div>
-              <p className="text-muted-foreground max-w-2xl mb-8">
-                What the autonomous desk checked, decided, rejected, and published — step by step.
-              </p>
-
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-border ink-shadow">
-                {data.events.map((event) => (
-                  <div key={event.step} className="bg-background p-6">
-                    <div className="flex items-center gap-3 mb-3">
-                      <span className="flex size-7 items-center justify-center rounded-full bg-foreground text-background font-mono text-xs">
-                        {event.step}
-                      </span>
-                      <span className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">
-                        {event.source}
-                      </span>
-                    </div>
-                    <h3 className="font-display text-xl mb-2">{event.title}</h3>
-                    <p className="text-sm text-foreground/70 leading-relaxed">{event.detail}</p>
-                  </div>
-                ))}
-              </div>
             </div>
-          </section>
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
 
-          {/* Sources monitored + stack */}
-          <section className="border-b border-border bg-card/40">
-            <div className="max-w-[1400px] mx-auto px-6 lg:px-12 py-14 grid lg:grid-cols-2 gap-10">
-              <div>
-                <div className="flex items-center gap-3 mb-6">
-                  <span className="text-xs font-mono uppercase tracking-[0.22em] text-muted-foreground">
-                    Sources monitored
-                  </span>
-                  <span className="rule flex-1 max-w-[120px]" />
-                </div>
-                <div className="space-y-3">
-                  {data.sources.map((s) => (
-                    <div key={s.id} className="bg-background border border-border p-4 ink-shadow">
-                      <div className="font-medium">{s.name}</div>
-                      <div className="text-[0.65rem] font-mono uppercase tracking-[0.15em] text-muted-foreground mt-1">
-                        {s.category} · {s.sourceType}
-                      </div>
-                      <div className="text-xs text-muted-foreground truncate mt-1">{s.url}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+function SectionLabel({ label, compact = false, dark = false }: { label: string; compact?: boolean; dark?: boolean }) {
+  return (
+    <div className={`flex items-center gap-3 ${compact ? "mb-6" : "mb-10"}`}>
+      <span className={`text-xs uppercase tracking-[0.22em] ${dark ? "text-neutral-400" : "text-neutral-500"}`}>
+        {label}
+      </span>
+      <span className={`flex-1 h-px max-w-[200px] ${dark ? "bg-white/15" : "bg-black/15"}`} />
+    </div>
+  );
+}
 
-              <div>
-                <div className="flex items-center gap-3 mb-6">
-                  <span className="text-xs font-mono uppercase tracking-[0.22em] text-muted-foreground">
-                    Sponsor stack
-                  </span>
-                  <span className="rule flex-1 max-w-[120px]" />
-                </div>
-                <div className="grid gap-3">
-                  {Object.values(data.sponsorStack).map((sp) => (
-                    <div
-                      key={sp.provider}
-                      className="bg-background border border-border p-4 ink-shadow"
-                    >
-                      <div className="font-display text-xl mb-1">{sp.provider}</div>
-                      <p className="text-sm text-muted-foreground">{sp.role}</p>
-                    </div>
-                  ))}
-                </div>
+function Metric({ value, label }: { value: string | number; label: string }) {
+  return (
+    <div className="bg-black p-4">
+      <div className="text-3xl md:text-4xl font-bold">{value}</div>
+      <div className="text-[0.65rem] uppercase tracking-[0.18em] text-neutral-400 mt-1">
+        {label}
+      </div>
+    </div>
+  );
+}
 
-                <div className="mt-6 bg-background border border-border p-4 ink-shadow">
-                  <div className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground mb-1">
-                    ClickHouse ledger
-                  </div>
-                  <p className="text-sm text-foreground/80">
-                    {data.clickhouse.message || data.clickhouse.reason}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
+function BriefKicker({
+  verificationStatus,
+  category,
+  status,
+}: {
+  verificationStatus: string;
+  category: string;
+  status: string;
+}) {
+  return (
+    <div className="flex flex-wrap gap-2 mb-5">
+      <span className="text-[0.65rem] uppercase tracking-[0.15em] px-2 py-1 bg-black text-white">
+        {verificationStatus}
+      </span>
+      <span className="text-[0.65rem] uppercase tracking-[0.15em] px-2 py-1 border border-black/20">
+        {category}
+      </span>
+      <span className="text-[0.65rem] uppercase tracking-[0.15em] px-2 py-1 border border-black/20">
+        {status}
+      </span>
+    </div>
+  );
+}
 
-          <section className="py-16 text-center">
-            <p className="text-xs font-mono uppercase tracking-[0.22em] text-muted-foreground">
-              End of edition · {areaName} · Session {data.sessionId}
-            </p>
-          </section>
-        </>
-      )}
+function DetailBlock({ title, body }: { title: string; body: string }) {
+  return (
+    <div className="border-t border-black/15 pt-3">
+      <div className="text-[0.65rem] uppercase tracking-[0.18em] text-neutral-500 mb-1">
+        {title}
+      </div>
+      <p className="text-sm text-neutral-800">{body}</p>
     </div>
   );
 }

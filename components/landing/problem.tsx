@@ -1,35 +1,36 @@
+import Image from "next/image";
+
 export function Problem() {
   return (
-    <section className="relative border-t border-border bg-card/40 paper-grain">
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-12 py-24 lg:py-32 relative z-10">
-        <div className="flex items-center gap-3 mb-10">
-          <span className="text-xs font-mono uppercase tracking-[0.22em] text-muted-foreground">§ 01</span>
-          <span className="rule flex-1 max-w-[180px]" />
-          <span className="text-xs font-mono uppercase tracking-[0.22em] text-muted-foreground">The problem</span>
-        </div>
-
-        <div className="grid lg:grid-cols-[1fr_1.3fr] gap-10 lg:gap-20">
-          <h2 className="font-display text-4xl lg:text-6xl leading-[0.95] tracking-tight">
-            Public information,<br />
-            <span className="italic text-muted-foreground">privately ignored.</span>
-          </h2>
-
-          <div className="space-y-6 text-lg text-foreground/80 leading-relaxed">
-            <p>
-              Every day, your town hall posts agendas. Your county posts notices. Transit
-              posts service changes. Your school district updates calendars. Permits get
-              filed. PDFs get uploaded.
-            </p>
-            <p>
-              All of it is public. None of it is readable. Most of it is buried until it
-              affects someone — and by then it&apos;s too late to do anything about it.
-            </p>
-            <p className="font-mono text-sm text-muted-foreground border-l-2 border-foreground/40 pl-4">
-              The information isn&apos;t hidden. It&apos;s just shaped like
-              government, not like a newspaper.
-            </p>
-          </div>
-        </div>
+    <section className="flex flex-col lg:flex-row lg:justify-between lg:items-stretch min-h-screen bg-white">
+      <div className="flex-1 lg:order-1 px-6 md:px-10 py-16 lg:py-0 lg:pr-12 flex flex-col justify-center max-w-3xl">
+        <h3 className="uppercase mb-6 text-xs md:text-sm tracking-[0.22em] text-neutral-500">
+          § 01 — The problem
+        </h3>
+        <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-[0.95] tracking-tight mb-6 text-balance">
+          Public information,<br />
+          privately ignored.
+        </h2>
+        <p className="text-lg md:text-2xl lg:text-3xl mb-6 leading-snug font-light text-neutral-800 text-balance">
+          Every day, your town hall posts agendas. Your county posts notices. Transit posts service changes.
+          Permits get filed. PDFs get uploaded.
+        </p>
+        <p className="text-base md:text-lg text-neutral-600 mb-8 leading-relaxed max-w-xl">
+          All of it is public. None of it is readable. Most of it stays buried until it affects someone — and by
+          then it&apos;s too late to do anything about it.
+        </p>
+        <p className="text-sm md:text-base text-neutral-500 border-l-2 border-black pl-4 uppercase tracking-wide max-w-xl">
+          The information isn&apos;t hidden. It&apos;s just shaped like government, not like a newspaper.
+        </p>
+      </div>
+      <div className="flex-1 lg:order-2 relative h-[60vh] lg:h-auto lg:min-h-screen">
+        <Image
+          src="/images/newspaper2.webp"
+          alt="Newspaper pages and civic reporting"
+          fill
+          sizes="(max-width: 1024px) 100vw, 50vw"
+          className="object-cover grayscale"
+        />
       </div>
     </section>
   );
