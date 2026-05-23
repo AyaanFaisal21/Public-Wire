@@ -31,7 +31,7 @@ export type CivicBrief = {
     role: string;
   }[];
   auditLog: string[];
-  mentorReview: string;
+  reliabilityReview: string;
   updateHistory: string[];
   artifactLabel: string;
   investigationTrace: {
@@ -235,15 +235,15 @@ export const newBrunswickEdition = {
         },
       ],
       auditLog: [
-        "The source monitor checked 28 New Brunswick-area source surfaces across city, county, campus, transit, weather, schools, and public works layers.",
-        "The extractor found a new city construction notice mentioning George Street.",
-        "The change detector marked the notice as new compared with the previous demo snapshot.",
+        "The Source Scout checked 28 New Brunswick-area source surfaces across city, county, campus, transit, weather, schools, and public works layers.",
+        "The Source Scout found a new city construction notice mentioning George Street.",
+        "The Change Ledger marked the notice as new compared with the previous source snapshot.",
         "The editor agent kept the item because it affects downtown transportation access.",
-        "The verifier confirmed the core claim was supported by official source context.",
-        "The writer produced a short civic brief without adding unsupported delay estimates.",
-        "The mentor approved the brief for publication.",
+        "The Editorial Agent confirmed the core claim was supported by official source context.",
+        "The Grounding Agent produced a short civic brief without adding unsupported delay estimates.",
+        "The reliability reviewer approved the brief for publication.",
       ],
-      mentorReview:
+      reliabilityReview:
         "Approved. The entry uses official source context, avoids unsupported claims about exact traffic delay, clearly labels affected groups, and keeps the language appropriately cautious.",
       updateHistory: [
         "8:42 AM - Published as an upcoming transportation brief.",
@@ -265,7 +265,7 @@ export const newBrunswickEdition = {
           agent: "Source Scout",
           status: "checked",
           detail:
-            "The extractor converted the notice into a civic event object, separating the location, notice type, affected corridor, likely audience, and source text used for support.",
+            "The Source Scout converted the notice into a civic event object, separating the location, notice type, affected corridor, likely audience, and source text used for support.",
           query:
             "Extract title, affected street, posted date, event window, jurisdiction, and supporting source text. Do not infer closures not stated in the source.",
         },
@@ -274,7 +274,7 @@ export const newBrunswickEdition = {
           agent: "Editorial Agent",
           status: "verified",
           detail:
-            "The verifier checked every sentence in the proposed brief against the extracted source fields and rejected a draft phrase that implied exact traffic delays.",
+            "The Editorial Agent checked every sentence in the proposed brief against the extracted source fields and rejected a draft phrase that implied exact traffic delays.",
           query:
             "For each claim in candidate_brief, return supported, unsupported, or needs_more_context using only source excerpts.",
           technicalConfidence: "0.94",
@@ -284,7 +284,7 @@ export const newBrunswickEdition = {
           agent: "Reliability Reviewer",
           status: "verified",
           detail:
-            "The mentor approved publication because the item was resident-relevant, sourced from official context, and worded as a cautious transportation heads-up prediction while avoiding a.",
+            "The reliability reviewer approved publication because the item was resident-relevant, sourced from official context, and worded as a cautious transportation heads-up prediction while avoiding a.",
           query:
             "Review reporting chain for unsupported claims, overstatement, missing source links, stale dates, and public-facing clarity.",
         },
@@ -293,7 +293,7 @@ export const newBrunswickEdition = {
           agent: "Grounding Agent",
           status: "published",
           detail:
-            "The publisher attached source links, audit summary, update history, and the cited.md demo artifact label before placing the brief into the New Brunswick edition.",
+            "The Grounding Agent attached source links, audit summary, update history, and the cited.md artifact label before placing the brief into the New Brunswick edition.",
           query:
             "Publish approved civic micro-brief with source packet, reliability review, audit trail, and update policy.",
         },
@@ -329,12 +329,12 @@ export const newBrunswickEdition = {
       ],
       auditLog: [
         "The agenda source was checked during the New Brunswick run.",
-        "The extractor pulled a parking-related meeting item.",
+        "The Source Scout pulled a parking-related meeting item.",
         "The editor classified the item as resident-relevant but not urgent.",
-        "The verifier approved cautious publication because details may change after the meeting.",
-        "The mentor approved publication with cautious wording.",
+        "The Editorial Agent approved cautious publication because details may change after the meeting.",
+        "The reliability reviewer approved publication with cautious wording.",
       ],
-      mentorReview:
+      reliabilityReview:
         "Approved with cautious language. The brief should describe the agenda item, not claim a final policy change.",
       updateHistory: ["8:42 AM - Published as a monitoring item for meeting follow-up."],
       artifactLabel: "cited.md demo artifact: seeded_brief_parking_agenda",
@@ -353,7 +353,7 @@ export const newBrunswickEdition = {
           agent: "Source Scout",
           status: "checked",
           detail:
-            "The extractor found a parking-related topic but could not confirm whether it represented a final policy change, a discussion item, or an informational hearing.",
+            "The Source Scout found a parking-related topic but could not confirm whether it represented a final policy change, a discussion item, or an informational hearing.",
           query:
             "Extract meeting item, action verbs, affected location, decision status, public deadline, and exact source language.",
         },
@@ -362,7 +362,7 @@ export const newBrunswickEdition = {
           agent: "Editorial Agent",
           status: "needs-evidence",
           detail:
-            "The verifier refused the first draft because the claim was too strong. The source supported 'agenda includes discussion' but not 'parking fees are changing.'",
+            "The Editorial Agent refused the first draft because the claim was too strong. The source supported 'agenda includes discussion' but not 'parking fees are changing.'",
           query:
             "Can the source support the claim 'parking fees are changing'? If not, identify the weakest claim that is still supported.",
           technicalConfidence: "0.61 before resend",
@@ -390,7 +390,7 @@ export const newBrunswickEdition = {
           agent: "Editorial Agent",
           status: "verified",
           detail:
-            "The verifier approved a revised claim: the agenda includes a downtown parking discussion. The published brief now avoids saying a change has been enacted.",
+            "The Editorial Agent approved a revised claim: the agenda includes a downtown parking discussion. The published brief now avoids saying a change has been enacted.",
           query:
             "Re-check revised headline and summary against city agenda source plus parking authority context.",
           technicalConfidence: "0.87 after resend",
@@ -400,7 +400,7 @@ export const newBrunswickEdition = {
           agent: "Reliability Reviewer",
           status: "published",
           detail:
-            "The mentor approved publication as a monitoring item and required the article to signal that follow-up is needed after the meeting.",
+            "The reliability reviewer approved publication as a monitoring item and required the article to signal that follow-up is needed after the meeting.",
           query:
             "Should this be published, revised, monitored only, or blocked? Explain the editorial risk.",
         },
@@ -441,12 +441,12 @@ export const newBrunswickEdition = {
       ],
       auditLog: [
         "The event source was checked with the campus layer.",
-        "The extractor identified a scheduled public event near College Avenue.",
+        "The Source Scout identified a scheduled public event near College Avenue.",
         "The editor kept the item because it may affect nearby access and parking.",
-        "The verifier found no official traffic advisory, so the brief avoids claiming disruption.",
-        "The mentor approved publication because the uncertainty is clearly labeled.",
+        "The Editorial Agent found no official traffic advisory, so the brief avoids claiming disruption.",
+        "The reliability reviewer approved publication because the uncertainty is clearly labeled.",
       ],
-      mentorReview:
+      reliabilityReview:
         "Approved. The entry is useful as a campus-area heads-up and does not overstate the transportation impact.",
       updateHistory: ["8:42 AM - Published as a source-backed campus-area heads-up."],
       artifactLabel: "cited.md demo artifact: seeded_brief_rutgers_college_ave",
@@ -465,7 +465,7 @@ export const newBrunswickEdition = {
           agent: "Source Scout",
           status: "checked",
           detail:
-            "The extractor converted the listing into an event object and separated confirmed facts from likely but unconfirmed local effects.",
+            "The Source Scout converted the listing into an event object and separated confirmed facts from likely but unconfirmed local effects.",
           query:
             "Extract event title, time, campus area, public access notes, and language that directly supports affected groups.",
         },
@@ -474,7 +474,7 @@ export const newBrunswickEdition = {
           agent: "Editorial Agent",
           status: "needs-evidence",
           detail:
-            "The verifier found no official transportation advisory, so the system blocked language implying traffic disruption and kept only a campus-area heads-up.",
+            "The Editorial Agent found no official transportation advisory, so the system blocked language implying traffic disruption and kept only a campus-area heads-up.",
           query:
             "Search attached source packet for official traffic, transit, closure, or parking advisory. If absent, limit claims.",
           technicalConfidence: "0.74",
@@ -493,7 +493,7 @@ export const newBrunswickEdition = {
           agent: "Reliability Reviewer",
           status: "published",
           detail:
-            "The mentor approved publication because the uncertainty is explicit, the source is public, and the brief does not overstate the impact.",
+            "The reliability reviewer approved publication because the uncertainty is explicit, the source is public, and the brief does not overstate the impact.",
           query:
             "Review uncertainty wording and ensure the article does not invent traffic or transit impacts.",
         },

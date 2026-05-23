@@ -193,7 +193,7 @@ export default async function BriefPage({ params }: BriefPageProps) {
         <section className="border-b border-black/10 bg-neutral-50">
           <div className="max-w-[1100px] mx-auto px-6 md:px-10 py-14 grid lg:grid-cols-2 gap-10">
             <BriefSection title="Reliability Reviewer Review">
-              <p>{brief.mentorReview}</p>
+              <p>{brief.reliabilityReview}</p>
             </BriefSection>
 
             <BriefSection title="Update History">

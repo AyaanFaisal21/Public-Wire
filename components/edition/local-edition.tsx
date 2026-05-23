@@ -248,7 +248,7 @@ export function LocalEdition({ areaSlug, areaName, focus }: Props) {
                 <div className="text-[0.7rem] uppercase tracking-[0.22em] text-neutral-400 mb-2">
                   Reliability review
                 </div>
-                <p className="text-sm text-neutral-200 leading-relaxed">{topBrief.mentorReview}</p>
+                <p className="text-sm text-neutral-200 leading-relaxed">{topBrief.reliabilityReview}</p>
               </div>
             </aside>
           </div>
@@ -633,7 +633,7 @@ function InvestigationDialog({
                   <div className="text-[0.65rem] uppercase tracking-[0.2em] text-neutral-400 mb-3">
                     Reliability review
                   </div>
-                  <p className="text-sm leading-relaxed text-neutral-200">{brief.mentorReview}</p>
+                  <p className="text-sm leading-relaxed text-neutral-200">{brief.reliabilityReview}</p>
                 </div>
 
                 <div className="mt-8 border-t border-white/15 pt-6">

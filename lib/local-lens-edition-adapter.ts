@@ -292,7 +292,7 @@ function mapBrief(scan: ScanResult, change: ScanChange, index: number): CivicBri
             role: `Used as source context for ${change.title}.`,
           })),
     auditLog: buildAuditLog(scan, change),
-    mentorReview: isRequested
+    reliabilityReview: isRequested
       ? "Demand is high enough to investigate, but repeated requests are used as an investigation trigger. The claim remains unverified until Nimble/Gemini find public or official corroboration."
       : scan.lapdogReview?.verdict ||
         scan.googleEditorial?.decision.reason ||
