@@ -225,8 +225,13 @@ function buildInvestigationTrace(scan: ScanResult, change: ScanChange) {
   return trace;
 }
 
+function isRequestedTopicChange(change: ScanChange) {
+  return change.id.startsWith("requested_") || change.title.startsWith("Requested topic under review:");
+}
+
 function mapBrief(scan: ScanResult, change: ScanChange, index: number): CivicBrief {
   const isLead = index === 0;
+  const isRequested = isRequestedTopicChange(change);
   const id = index === 0 ? scan.brief.id : `brief_${slugify(change.title)}`;
 
   return {
@@ -234,10 +239,11 @@ function mapBrief(scan: ScanResult, change: ScanChange, index: number): CivicBri
     slug: slugify(change.title),
     headline: change.title,
     area: scan.area,
-    category: titleCase(change.category),
+    category: isRequested ? "Claim Review" : titleCase(change.category),
     status: isLead ? normalizeBriefStatus(scan.brief.status) : "monitoring",
-    verificationStatus:
-      scan.googleEditorial?.mode === "real-api"
+    verificationStatus: isRequested
+      ? "Demand-triggered investigation"
+      : scan.googleEditorial?.mode === "real-api"
         ? "Gemini verified"
         : "Source-backed",
     publishedAt: scan.lastChecked,
@@ -245,19 +251,25 @@ function mapBrief(scan: ScanResult, change: ScanChange, index: number): CivicBri
       hour: "numeric",
       minute: "2-digit",
     }),
-    sortLabel: isLead ? "Just drafted" : "Monitoring",
-    impactLabel:
-      change.importance === "urgent"
+    sortLabel: isRequested ? "Requested" : isLead ? "Just drafted" : "Monitoring",
+    impactLabel: isRequested
+      ? "Legitimacy check"
+      : change.importance === "urgent"
         ? "Urgent"
         : change.importance === "resident-relevant"
           ? "Resident impact"
           : "Civic signal",
-    priorityReason:
-      isLead
+    priorityReason: isRequested
+      ? "Reader demand crossed the threshold, so LocalLens opened an investigation without treating the repeated claim as fact."
+      : isLead
         ? scan.googleEditorial?.decision.reason ||
           "Leads the edition because it passed the live editorial and reliability gates."
         : "Included because the live scan found a resident-facing public source update.",
-    summary: isLead ? scan.brief.summary : change.whatChanged,
+    summary: isRequested
+      ? `${change.whatChanged} Current status: unverified until public or official sources corroborate it.`
+      : isLead
+        ? scan.brief.summary
+        : change.whatChanged,
     whyItMatters: change.whyItMatters,
     whoIsAffected: change.whoIsAffected,
     whatChanged: change.whatChanged,
@@ -271,10 +283,11 @@ function mapBrief(scan: ScanResult, change: ScanChange, index: number): CivicBri
             role: `Used as source context for ${change.title}.`,
           })),
     auditLog: buildAuditLog(scan, change),
-    mentorReview:
-      scan.lapdogReview?.verdict ||
-      scan.googleEditorial?.decision.reason ||
-      "Approved by the live LocalLens reliability gate.",
+    mentorReview: isRequested
+      ? "Demand is high enough to investigate, but repeated requests are not treated as evidence. The claim remains unverified until Nimble/Gemini find public or official corroboration."
+      : scan.lapdogReview?.verdict ||
+        scan.googleEditorial?.decision.reason ||
+        "Approved by the live LocalLens reliability gate.",
     updateHistory: [
       `${scan.lastChecked} - Generated from live sponsor-backed scan ${scan.sessionId}.`,
       scan.publishing?.citationId
