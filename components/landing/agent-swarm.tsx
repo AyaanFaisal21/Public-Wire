@@ -54,14 +54,13 @@ export function AgentSwarm() {
               § 06 , The newsroom
             </h3>
             <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-[0.92] tracking-tight text-balance">
-              Twelve different agents.<br />Twelve newsroom jobs.
+              Five agent steps.<br />One inspectable chain.
             </h2>
           </div>
           <p className="text-lg md:text-2xl text-neutral-200 leading-snug font-light text-balance self-end max-w-2xl">
-            LocalLens treats the swarm like a small civic newsroom: one agent scouts,
-            one watches sources, one verifies, one writes, and one acts like a public
-            editor. They behave like different employees at a press desk, each with a
-            narrow job and a handoff the next person can inspect.
+            LocalLens uses a five-step chain: Nimble finds civic source material,
+            ClickHouse records the audit trail, Gemini makes the editorial decision,
+            Senso grounds the brief, and Datadog Lapdog traces the reliability layer.
           </p>
         </div>
 
@@ -78,6 +77,9 @@ export function AgentSwarm() {
               <div className="flex items-baseline justify-between mb-2">
                 <span className="text-[0.7rem] uppercase tracking-[0.18em] text-neutral-400 group-hover:text-neutral-600 transition-colors">
                   Agent {String(idx + 1).padStart(2, "0")}
+                </span>
+                <span className="text-[0.6rem] uppercase tracking-[0.15em] text-neutral-400 group-hover:text-neutral-600 transition-colors">
+                  {agent.provider}
                 </span>
                 {agent.reviewer && (
                   <span className="text-[0.6rem] uppercase tracking-[0.15em] px-1.5 py-0.5 bg-white text-black group-hover:bg-black group-hover:text-white transition-colors">

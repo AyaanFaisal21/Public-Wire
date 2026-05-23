@@ -146,20 +146,29 @@ function mapRejected(change: ScanChange): RejectedItem {
   };
 }
 
+function publicAgentName(source: string) {
+  if (source === "Nimble") return "Source Scout";
+  if (source === "ClickHouse") return "Change Ledger";
+  if (source === "Editorial Agent") return "Editorial Agent";
+  if (source === "Senso") return "Grounding Agent";
+  if (source === "Datadog Lapdog") return "Reliability Reviewer";
+  return source;
+}
+
+function publicAgentTool(source: string) {
+  if (source === "Nimble") return "Nimble civic source discovery";
+  if (source === "ClickHouse") return "ClickHouse audit ledger";
+  if (source === "Editorial Agent") return "Gemini editorial decision";
+  if (source === "Senso") return "Senso grounding";
+  if (source === "Datadog Lapdog") return "Datadog Lapdog trace review";
+  return source;
+}
+
 function mapEvent(event: ScanEvent): AgentEvent {
   return {
     step: event.step,
-    agent: event.source,
-    tool:
-      event.source === "Nimble"
-        ? "Nimble live civic scan"
-        : event.source === "ClickHouse"
-          ? "ClickHouse ledger"
-          : event.source === "Google Gemini"
-            ? "Gemini editorial agent"
-            : event.source === "Senso"
-              ? "Senso grounding"
-              : event.source,
+    agent: publicAgentName(event.source),
+    tool: publicAgentTool(event.source),
     action: event.title,
     result: event.detail,
   };
@@ -193,16 +202,16 @@ function buildInvestigationTrace(scan: ScanResult, change: ScanChange) {
 
   const trace: CivicBrief["investigationTrace"] = scan.events.map((event, index) => ({
     time: now,
-    agent: event.source,
+    agent: publicAgentName(event.source),
     status:
-      event.source === "Google Gemini" || event.source === "Senso"
+      event.source === "Editorial Agent" || event.source === "Senso"
         ? ("verified" as const)
         : ("checked" as const),
     detail: event.detail,
     query:
       event.source === "Nimble"
         ? `Find official/public civic updates for ${scan.area}.`
-        : event.source === "Google Gemini"
+        : event.source === "Editorial Agent"
           ? `Evaluate whether "${change.title}" is resident-relevant, source-backed, and publishable.`
           : event.source === "Senso"
             ? `Ground "${scan.brief.headline}" against LocalLens organization context.`
@@ -214,10 +223,10 @@ function buildInvestigationTrace(scan: ScanResult, change: ScanChange) {
   if (scan.lapdogReview) {
     trace.push({
       time: now,
-      agent: "Datadog Lapdog",
+      agent: "Reliability Reviewer",
       status: scan.lapdogReview.passed ? "verified" : "needs-evidence",
       detail: `${scan.lapdogReview.provider} ${scan.lapdogReview.mode}: ${scan.lapdogReview.verdict}`,
-      query: "Trace Nimble, ClickHouse, Gemini, Senso, and reliability review spans.",
+      query: "Trace Source Scout, Change Ledger, Editorial Agent, Grounding Agent, and Reliability Reviewer spans.",
       technicalConfidence: String(scan.lapdogReview.score / 100),
     });
   }
