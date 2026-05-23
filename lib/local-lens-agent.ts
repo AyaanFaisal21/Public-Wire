@@ -6,13 +6,19 @@ import { googleEditorialDecision } from "./sponsors/google-editor";
 import { runLapdogReliabilityReview } from "./sponsors/lapdog-review";
 import { traceStep } from "./datadog-trace";
 
-export async function runLocalLensScan() {
+export async function runLocalLensScan(params?: {
+  area?: string;
+  slug?: string;
+  focus?: string[];
+}) {
   const sessionId = `scan_${Date.now()}`;
-  const area = "New Brunswick, NJ";
+  const area = params?.area || "New Brunswick, NJ";
+  const slug = params?.slug || "new-brunswick";
+  const focus = params?.focus || [];
 
   const nimble = await traceStep(
     "nimble.civic_scan",
-    { area, sponsor: "nimble" },
+    { area, slug, focus: focus.join(","), sponsor: "nimble" },
     () =>
       nimbleRunCivicScan({
         area,
@@ -88,7 +94,7 @@ export async function runLocalLensScan() {
 
   const clickhouse = await traceStep(
     "clickhouse.ledger_write",
-    { area, session_id: sessionId, sponsor: "clickhouse" },
+    { area, slug, session_id: sessionId, sponsor: "clickhouse" },
     () =>
       logRecallFormRun({
         sessionId,
@@ -99,7 +105,7 @@ export async function runLocalLensScan() {
 
   const googleEditorial = await traceStep(
     "gemini.editorial_decision",
-    { area, sponsor: "google_gemini", candidate_count: published.length },
+    { area, slug, sponsor: "google_gemini", candidate_count: published.length },
     () =>
       googleEditorialDecision({
         area,
@@ -109,7 +115,7 @@ export async function runLocalLensScan() {
 
   const sensoPublish = await traceStep(
     "senso.grounding",
-    { area, sponsor: "senso", brief_id: publishedBrief.id },
+    { area, slug, sponsor: "senso", brief_id: publishedBrief.id },
     () =>
       publishCivicBrief({
         brief: publishedBrief,
@@ -118,7 +124,7 @@ export async function runLocalLensScan() {
 
   const lapdogReview = await traceStep(
     "lapdog.reliability_review",
-    { area, sponsor: "datadog_lapdog", brief_id: publishedBrief.id },
+    { area, slug, sponsor: "datadog_lapdog", brief_id: publishedBrief.id },
     () =>
       runLapdogReliabilityReview({
         headline: publishedBrief.headline,
