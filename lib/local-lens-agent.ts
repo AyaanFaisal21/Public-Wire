@@ -1,39 +1,57 @@
 import { localSources, publishedBrief, seededChanges } from "./local-lens-data";
 import { logRecallFormRun } from "./clickhouse";
+import { nimbleRunCivicScan } from "./sponsors/nimble-civic";
 
 export async function runLocalLensScan() {
   const sessionId = `scan_${Date.now()}`;
+  const area = "New Brunswick, NJ";
 
-  const published = seededChanges.filter((change) => change.status !== "rejected");
-  const rejected = seededChanges.filter((change) => change.status === "rejected");
+  const nimble = await nimbleRunCivicScan({
+    area,
+    fallbackSources: localSources,
+    fallbackChanges: seededChanges,
+  });
+
+  const changes = nimble.changes;
+  const sources = nimble.sources;
+  const published = changes.filter((change) => change.status !== "rejected");
+  const rejected = changes.filter((change) => change.status === "rejected");
 
   const events = [
     {
       step: 1,
-      title: "Source monitor started",
-      detail: "LocalLens began checking public civic sources for New Brunswick, NJ.",
+      title: "Source discovery started",
+      detail: `Nimble scanned for official and public civic sources around ${area}.`,
       source: "Nimble",
       risk: "low",
       status: "done",
     },
     {
       step: 2,
-      title: "Sources extracted",
-      detail: "Nimble extracted civic notices, transportation alerts, event pages, and parking authority pages.",
+      title: "Civic sources extracted",
+      detail: `Nimble returned ${sources.length} monitorable civic sources.`,
       source: "Nimble",
       risk: "low",
       status: "done",
     },
     {
       step: 3,
-      title: "Changes compared",
-      detail: "ClickHouse compared current source snapshots against previous snapshots.",
-      source: "ClickHouse",
+      title: "Changes structured",
+      detail: `Nimble produced ${changes.length} structured civic change candidates.`,
+      source: "Nimble",
       risk: "low",
       status: "done",
     },
     {
       step: 4,
+      title: "Changes compared",
+      detail: "ClickHouse compares current source state against previous snapshots and publish history.",
+      source: "ClickHouse",
+      risk: "low",
+      status: "done",
+    },
+    {
+      step: 5,
       title: "Editorial decision made",
       detail: "Agent classified updates as resident-relevant, routine, duplicate, or unsupported.",
       source: "Policy",
@@ -41,29 +59,21 @@ export async function runLocalLensScan() {
       status: "done",
     },
     {
-      step: 5,
+      step: 6,
       title: "Grounded brief generated",
       detail: "Senso/cited publishing layer created a short source-backed civic brief.",
       source: "Senso",
       risk: "medium",
       status: "done",
     },
-    {
-      step: 6,
-      title: "Agent trace saved",
-      detail: "The published brief includes the source list, evidence, and plain-English agent trace.",
-      source: "ClickHouse",
-      risk: "low",
-      status: "done",
-    },
   ];
 
   const metrics = {
-    sourcesChecked: localSources.length,
-    changesDetected: seededChanges.length,
-    briefsPublished: 1,
+    sourcesChecked: sources.length,
+    changesDetected: changes.length,
+    briefsPublished: published.length > 0 ? 1 : 0,
     rejectedItems: rejected.length,
-    officialSources: localSources.filter((source) => source.sourceType === "official").length,
+    officialSources: sources.filter((source) => source.sourceType === "official").length,
     confidenceScore: 94,
   };
 
@@ -75,10 +85,10 @@ export async function runLocalLensScan() {
 
   return {
     sessionId,
-    area: "New Brunswick, NJ",
+    area,
     lastChecked: new Date().toLocaleString(),
-    sources: localSources,
-    changes: seededChanges,
+    sources,
+    changes,
     published,
     rejected,
     brief: publishedBrief,
@@ -88,7 +98,7 @@ export async function runLocalLensScan() {
     sponsorStack: {
       nimble: {
         provider: "Nimble",
-        role: "Extracts structured civic facts from messy public local web sources.",
+        role: `${nimble.mode}: ${nimble.purpose}`,
       },
       clickhouse: {
         provider: "ClickHouse",
