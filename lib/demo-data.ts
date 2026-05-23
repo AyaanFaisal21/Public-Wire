@@ -56,13 +56,13 @@ export const scenarios: Record<ErrandType, ErrandScenario> = {
       {
         field: "Usual brand",
         answer: "Bounty Select-A-Size, 12 rolls, $28.99, delivery Tuesday",
-        provenance: "Nimble extraction from mock Amazon product page",
+        provenance: "Nimble extraction from /mock/retailer/paper-towels",
         confidence: "high",
       },
       {
         field: "Cheaper bulk option",
         answer: "StoreBrand Ultra, 16 rolls, $24.32, delivery Thursday",
-        provenance: "Nimble extraction from mock retailer product page",
+        provenance: "Nimble extraction from /mock/retailer/bulk-paper-towels",
         confidence: "high",
       },
       {
@@ -171,19 +171,19 @@ export const scenarios: Record<ErrandType, ErrandScenario> = {
       {
         field: "Return window",
         answer: "Return eligible until June 5, 2026",
-        provenance: "Nimble extraction from mock order page",
+        provenance: "Nimble extraction from /mock/orders/headphones",
         confidence: "high",
       },
       {
         field: "Refund method",
         answer: "Refund to original payment method",
-        provenance: "Nimble extraction from mock retailer return policy",
+        provenance: "Nimble extraction from /mock/orders/headphones",
         confidence: "high",
       },
       {
         field: "Return method",
         answer: "UPS dropoff available, free label",
-        provenance: "Nimble extraction from return options page",
+        provenance: "Nimble extraction from /mock/orders/headphones",
         confidence: "high",
       },
     ],
@@ -288,13 +288,13 @@ export const scenarios: Record<ErrandType, ErrandScenario> = {
       {
         field: "Clinic instructions",
         answer: "Complete medication, allergies, symptom timeline, falls, insurance, and daily living sections before visit.",
-        provenance: "Nimble extraction from mock clinic form instructions",
+        provenance: "Nimble extraction from /mock/clinic/neurology-intake",
         confidence: "high",
       },
       {
         field: "Activities of daily living",
         answer: "Bathing, dressing, transferring, toileting, eating, and moving around the home",
-        provenance: "Nimble extraction from official plain-language guidance",
+        provenance: "Nimble extraction from /mock/clinic/neurology-intake",
         confidence: "high",
       },
       {
