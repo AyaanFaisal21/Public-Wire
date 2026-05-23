@@ -1,0 +1,42 @@
+import { NextResponse } from "next/server";
+
+export async function GET() {
+  return NextResponse.json({
+    nimble: {
+      configured: Boolean(process.env.NIMBLE_API_KEY),
+      mode: process.env.NIMBLE_API_KEY ? "real-api-ready" : "missing-key",
+      required: ["NIMBLE_API_KEY"],
+    },
+    senso: {
+      configured: Boolean(
+        (process.env.SENSO_PUBLISH_URL && process.env.SENSO_API_KEY) ||
+          (process.env.CITED_API_URL && process.env.CITED_API_KEY)
+      ),
+      mode:
+        (process.env.SENSO_PUBLISH_URL && process.env.SENSO_API_KEY) ||
+        (process.env.CITED_API_URL && process.env.CITED_API_KEY)
+          ? "real-api-ready"
+          : "fallback",
+      required: ["SENSO_PUBLISH_URL + SENSO_API_KEY", "or CITED_API_URL + CITED_API_KEY"],
+    },
+    clickhouse: {
+      configured: Boolean(
+        process.env.CLICKHOUSE_URL &&
+          process.env.CLICKHOUSE_USERNAME &&
+          process.env.CLICKHOUSE_PASSWORD
+      ),
+      mode:
+        process.env.CLICKHOUSE_URL &&
+        process.env.CLICKHOUSE_USERNAME &&
+        process.env.CLICKHOUSE_PASSWORD
+          ? "real-api-ready"
+          : "fallback",
+      required: ["CLICKHOUSE_URL", "CLICKHOUSE_USERNAME", "CLICKHOUSE_PASSWORD"],
+    },
+    googleAgentCli: {
+      configured: Boolean(process.env.GEMINI_API_KEY || process.env.GOOGLE_CLOUD_PROJECT),
+      mode: process.env.GEMINI_API_KEY || process.env.GOOGLE_CLOUD_PROJECT ? "ready" : "not-configured",
+      required: ["GEMINI_API_KEY", "GOOGLE_CLOUD_PROJECT"],
+    },
+  });
+}
