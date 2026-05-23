@@ -19,6 +19,12 @@ type Props = {
   focus: string[];
 };
 
+type CoverageNotification = {
+  title: string;
+  message: string;
+  requestedTopic: string;
+};
+
 export function LocalEdition({ areaSlug, areaName, focus }: Props) {
   const fallbackEdition = getEditionBySlug(areaSlug);
   const [edition, setEdition] = useState<LocalEditionDemo>(fallbackEdition);
@@ -29,8 +35,10 @@ export function LocalEdition({ areaSlug, areaName, focus }: Props) {
   const [liveLoading, setLiveLoading] = useState(false);
   const [liveError, setLiveError] = useState<string | null>(null);
   const [liveLoaded, setLiveLoaded] = useState(false);
+  const [coverageNotification, setCoverageNotification] =
+    useState<CoverageNotification | null>(null);
 
-  async function runLiveSponsorScan() {
+  async function runLiveSponsorScan(requestedTopic?: string) {
     setLiveLoading(true);
     setLiveError(null);
 
@@ -44,6 +52,7 @@ export function LocalEdition({ areaSlug, areaName, focus }: Props) {
           area: areaName || edition.area,
           slug: areaSlug,
           focus,
+          requestedTopic,
         }),
       });
 
@@ -55,6 +64,7 @@ export function LocalEdition({ areaSlug, areaName, focus }: Props) {
 
       setEdition(data.edition);
       setLiveLoaded(true);
+      if (requestedTopic) setCoverageNotification(null);
     } catch (error) {
       setLiveError(error instanceof Error ? error.message : String(error));
     } finally {
@@ -128,7 +138,7 @@ export function LocalEdition({ areaSlug, areaName, focus }: Props) {
           <div className="mt-8 flex flex-wrap gap-3">
             <button
               type="button"
-              onClick={runLiveSponsorScan}
+              onClick={() => runLiveSponsorScan()}
               disabled={liveLoading}
               className="btn-solid-dark disabled:cursor-not-allowed disabled:opacity-60"
             >
@@ -156,6 +166,20 @@ export function LocalEdition({ areaSlug, areaName, focus }: Props) {
             </div>
           )}
 
+          {coverageNotification && (
+            <div className="mt-4 border border-blue-600 bg-blue-50 p-4 text-sm text-blue-900">
+              <div className="font-bold">{coverageNotification.title}</div>
+              <p className="mt-1">{coverageNotification.message}</p>
+              <button
+                type="button"
+                onClick={() => runLiveSponsorScan(coverageNotification.requestedTopic)}
+                className="mt-3 inline-flex items-center gap-2 border border-blue-700 px-3 py-2 text-xs font-bold uppercase tracking-[0.14em]"
+              >
+                Refresh live feed with requested topic
+              </button>
+            </div>
+          )}
+
           </div>
         </div>
       </section>
@@ -174,13 +198,7 @@ export function LocalEdition({ areaSlug, areaName, focus }: Props) {
           <SectionLabel label="Top story" />
 
           <div className="grid lg:grid-cols-[1.4fr_1fr] gap-px bg-black/10 border border-black/10">
-            <motion.article
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              className="bg-white p-8 md:p-12"
-            >
+            <article className="bg-white p-8 md:p-12">
               <BriefKicker
                 verificationStatus={topBrief.verificationStatus}
                 category={topBrief.category}
@@ -210,15 +228,9 @@ export function LocalEdition({ areaSlug, areaName, focus }: Props) {
                   <SearchCheck className="size-4" /> Investigate agent work
                 </button>
               </div>
-            </motion.article>
+            </article>
 
-            <motion.aside
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-              className="bg-black text-white p-8 md:p-10"
-            >
+            <aside className="bg-black text-white p-8 md:p-10">
               <div className="text-[0.7rem] uppercase tracking-[0.22em] text-neutral-400 mb-4">
                 Agent audit log
               </div>
@@ -238,7 +250,7 @@ export function LocalEdition({ areaSlug, areaName, focus }: Props) {
                 </div>
                 <p className="text-sm text-neutral-200 leading-relaxed">{topBrief.mentorReview}</p>
               </div>
-            </motion.aside>
+            </aside>
           </div>
         </div>
       </section>
@@ -355,9 +367,13 @@ export function LocalEdition({ areaSlug, areaName, focus }: Props) {
       <InvestigationDialog brief={selectedBrief} onOpenChange={(open) => !open && setSelectedBrief(null)} />
       <CoverageRequestDialog
         area={edition.area}
+        areaSlug={areaSlug}
         open={requestOpen}
         submitted={requestSubmitted}
-        onSubmit={() => setRequestSubmitted(true)}
+        onSubmit={(notification) => {
+          setRequestSubmitted(true);
+          if (notification) setCoverageNotification(notification);
+        }}
         onOpenChange={(open) => {
           setRequestOpen(open);
           if (!open) setRequestSubmitted(false);
@@ -369,17 +385,61 @@ export function LocalEdition({ areaSlug, areaName, focus }: Props) {
 
 function CoverageRequestDialog({
   area,
+  areaSlug,
   open,
   submitted,
   onSubmit,
   onOpenChange,
 }: {
   area: string;
+  areaSlug: string;
   open: boolean;
   submitted: boolean;
-  onSubmit: () => void;
+  onSubmit: (notification: CoverageNotification | null) => void;
   onOpenChange: (open: boolean) => void;
 }) {
+  const [topic, setTopic] = useState("");
+  const [sourceHint, setSourceHint] = useState("");
+  const [requestError, setRequestError] = useState<string | null>(null);
+  const [requestCount, setRequestCount] = useState<number | null>(null);
+  const [requestScore, setRequestScore] = useState<number | null>(null);
+  const [requestLoading, setRequestLoading] = useState(false);
+
+  async function queueCoverageRequest(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setRequestLoading(true);
+    setRequestError(null);
+
+    try {
+      const response = await fetch("/api/local-lens/coverage-request", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          area,
+          slug: areaSlug,
+          topic,
+          sourceHint,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.error || data?.detail || "Request failed");
+      }
+
+      setRequestCount(data.record?.count ?? null);
+      setRequestScore(data.record?.score ?? null);
+      onSubmit(data.notification ?? null);
+    } catch (error) {
+      setRequestError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setRequestLoading(false);
+    }
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="rounded-none border-black bg-white text-black sm:max-w-[720px]">
@@ -402,27 +462,28 @@ function CoverageRequestDialog({
               Request queued
             </div>
             <p className="text-sm text-neutral-800 leading-relaxed">
-              The Source Scout would now look for official notices, meeting records,
-              agency pages, public calendars, permit databases, alerts, or cited public
-              artifacts. If enough residents ask and the evidence exists, the topic can
-              move into the edition queue.
+              The topic was queued for demand scoring. Repeated similar requests can trigger
+              a source-backed investigation, but the system still separates popular claims
+              from supported claims before publishing.
             </p>
+            {requestCount !== null && (
+              <p className="mt-3 text-sm text-neutral-700">
+                Demand count: <strong>{requestCount}</strong> · Score:{" "}
+                <strong>{requestScore}</strong>
+              </p>
+            )}
           </div>
         ) : (
-          <form
-            className="space-y-4"
-            onSubmit={(event) => {
-              event.preventDefault();
-              onSubmit();
-            }}
-          >
+          <form className="space-y-4" onSubmit={queueCoverageRequest}>
             <label className="block">
               <span className="mb-2 block text-[0.65rem] uppercase tracking-[0.18em] text-neutral-500">
                 Topic or claim
               </span>
               <textarea
+                value={topic}
+                onChange={(event) => setTopic(event.target.value)}
                 className="min-h-28 w-full border border-black/20 bg-white p-3 text-sm outline-none focus:border-black"
-                placeholder="Example: Are there planned bus stop changes near College Ave next week?"
+                placeholder="Example: Is there a water main break near Washington Street causing brown water?"
               />
             </label>
             <label className="block">
@@ -430,6 +491,8 @@ function CoverageRequestDialog({
                 Optional source or place to check
               </span>
               <input
+                value={sourceHint}
+                onChange={(event) => setSourceHint(event.target.value)}
                 className="w-full border border-black/20 bg-white p-3 text-sm outline-none focus:border-black"
                 placeholder="Agency page, agenda, PDF, public post, address, or source name"
               />
@@ -448,8 +511,19 @@ function CoverageRequestDialog({
                 No source support means no brief.
               </div>
             </div>
-            <button type="submit" className="btn-solid-dark">
-              <Send className="size-4" /> Queue topic check
+            {requestError && (
+              <div className="border border-red-500 bg-red-50 p-3 text-sm text-red-700">
+                {requestError}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={requestLoading}
+              className="btn-solid-dark disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <Send className="size-4" />
+              {requestLoading ? "Queuing..." : "Queue topic check"}
             </button>
           </form>
         )}

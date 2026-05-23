@@ -8,8 +8,11 @@ export async function POST(request: Request) {
     const area = body.area || "New Brunswick, NJ";
     const slug = body.slug || "new-brunswick";
     const focus = Array.isArray(body.focus) ? body.focus : [];
+    const requestedTopic = body.requestedTopic
+      ? String(body.requestedTopic).trim()
+      : undefined;
 
-    const scan = await runLocalLensScan({ area, slug, focus });
+    const scan = await runLocalLensScan({ area, slug, focus, requestedTopic });
     const edition = toLocalEditionDemo(scan, slug);
 
     return NextResponse.json({ edition, scan });
