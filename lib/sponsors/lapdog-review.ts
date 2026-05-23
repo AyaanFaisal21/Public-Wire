@@ -60,7 +60,7 @@ export async function runLapdogReliabilityReview(
         name: "Claim specificity",
         status: input.headline.length > 20 && input.summary.length > 40 ? "pass" : "warn",
         comment:
-          "Headline and summary include a specific location/topic instead of a vague civic claim.",
+          "Headline and summary include a specific location/topic claim while avoiding a vague civic.",
       },
       {
         name: "Resident impact",

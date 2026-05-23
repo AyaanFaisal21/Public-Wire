@@ -5,7 +5,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 
 const AGENTS = [
-  { name: "Area Mapper", role: "Resolves a search into the right civic layers — state, county, city, neighborhood, campus, services." },
+  { name: "Area Mapper", role: "Resolves a search into the right civic layers , state, county, city, neighborhood, campus, services." },
   { name: "Source Scout", role: "Finds and validates official and public sources for the area." },
   { name: "Source Monitor", role: "Repeatedly checks each source for new posts, edits, removals, and date shifts." },
   { name: "Extractor", role: "Turns hostile civic web pages and PDFs into structured civic events." },
@@ -13,7 +13,7 @@ const AGENTS = [
   { name: "Editor", role: "Filters routine administrative noise. Keeps what affects residents." },
   { name: "Verifier", role: "Checks each claim against source text and blocks unsupported wording." },
   { name: "Writer", role: "Drafts the brief from verified facts only. Never invents." },
-  { name: "Mentor", role: "Reviews the reporting agents’ work — sources, claims, behavior — before publication.", reviewer: true },
+  { name: "Mentor", role: "Reviews the reporting agents’ work , sources, claims, behavior , before publication.", reviewer: true },
   { name: "Publisher", role: "Posts approved briefs to the LocalLens edition and to the public cited artifact." },
   { name: "Audit Translator", role: "Turns raw agent traces into the plain-English “how this story was made” log." },
   { name: "Update Agent", role: "Keeps published briefs current as sources change after publication." },
@@ -51,7 +51,7 @@ export function AgentSwarm() {
         <div className="grid lg:grid-cols-[1fr_1.3fr] gap-10 lg:gap-20 mb-16">
           <div>
             <h3 className="uppercase mb-6 text-xs md:text-sm tracking-[0.22em] text-neutral-300">
-              § 06 — The newsroom
+              § 06 , The newsroom
             </h3>
             <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-[0.92] tracking-tight text-balance">
               Twelve different agents.<br />Twelve newsroom jobs.

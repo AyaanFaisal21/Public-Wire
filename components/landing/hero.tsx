@@ -60,7 +60,7 @@ export function Hero() {
                 >
                   LocalLens is a self-running local newspaper. An agent swarm
                   monitors public city sites, county notices, transit alerts,
-                  agendas, and event calendars — and publishes short, cited briefs
+                  agendas, and event calendars , and publishes short, cited briefs
                   when something actually changes for the people who live there.
                 </p>
               </div>

@@ -284,7 +284,7 @@ function mapBrief(scan: ScanResult, change: ScanChange, index: number): CivicBri
           })),
     auditLog: buildAuditLog(scan, change),
     mentorReview: isRequested
-      ? "Demand is high enough to investigate, but repeated requests are not treated as evidence. The claim remains unverified until Nimble/Gemini find public or official corroboration."
+      ? "Demand is high enough to investigate, but repeated requests are used as an investigation trigger. The claim remains unverified until Nimble/Gemini find public or official corroboration."
       : scan.lapdogReview?.verdict ||
         scan.googleEditorial?.decision.reason ||
         "Approved by the live LocalLens reliability gate.",

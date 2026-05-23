@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: AreaPageProps) {
   const edition = getEditionBySlug(area);
   const pretty = edition.area || prettifyArea(area);
   return {
-    title: `LocalLens ${pretty} — Today's Civic Briefing`,
+    title: `LocalLens ${pretty} , Today's Civic Briefing`,
     description: `Self-running civic newsroom for ${pretty}. Agent-monitored. Source-cited. Mentor-reviewed.`,
   };
 }

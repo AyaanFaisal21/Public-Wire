@@ -16,7 +16,7 @@ const AUDIT_LINES = [
   "Detected 3 meaningful changes since the previous snapshot.",
   "Rejected 5 routine administrative updates.",
   "Verified street, dates, and affected groups against official source.",
-  "Classified resident-relevant — affects downtown transportation.",
+  "Classified resident-relevant , affects downtown transportation.",
   "Mentor approved. No unsupported claims. No speculation.",
   "Published a cited micro-brief and added trace.",
 ];
@@ -46,7 +46,7 @@ export function TrustLayer() {
       <div className="max-w-[1400px] mx-auto px-6 md:px-10">
         <div className="mb-16 md:mb-20 max-w-4xl">
           <h3 className="uppercase mb-6 text-xs md:text-sm tracking-[0.22em] text-neutral-400">
-            § 04 — Trust layer
+            § 04 , Trust layer
           </h3>
           <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-[0.92] tracking-tight mb-6 text-balance">
             Every brief shows<br />its receipts.

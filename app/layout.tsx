@@ -3,7 +3,7 @@ import { PageTransition } from "@/components/page-transition";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "LocalLens — Self-running local newspapers, powered by civic agents",
+  title: "LocalLens , Self-running local newspapers, powered by civic agents",
   description:
     "LocalLens monitors public city sites, county notices, transit alerts, agendas, school updates, and event calendars, then publishes short cited briefs when something meaningful changes.",
 };

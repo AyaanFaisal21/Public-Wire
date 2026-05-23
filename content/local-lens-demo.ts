@@ -284,7 +284,7 @@ export const newBrunswickEdition = {
           agent: "Mentor",
           status: "verified",
           detail:
-            "The mentor approved publication because the item was resident-relevant, sourced from official context, and worded as a cautious transportation heads-up rather than a prediction.",
+            "The mentor approved publication because the item was resident-relevant, sourced from official context, and worded as a cautious transportation heads-up prediction while avoiding a.",
           query:
             "Review reporting chain for unsupported claims, overstatement, missing source links, stale dates, and public-facing clarity.",
         },
@@ -372,7 +372,7 @@ export const newBrunswickEdition = {
           agent: "Editor",
           status: "resent",
           detail:
-            "The editor sent the item back to Source Scout for corroboration instead of publishing an overclaim or silently dropping a potentially useful civic update.",
+            "The editor sent the item back to Source Scout for corroboration update while avoiding publishing an overclaim or silently dropping a potentially useful civic.",
           query:
             "Find secondary official context for New Brunswick downtown parking agenda item; prioritize parking authority, city agenda packet, or meeting notice.",
         },
@@ -381,7 +381,7 @@ export const newBrunswickEdition = {
           agent: "Source Scout",
           status: "checked",
           detail:
-            "Source Scout attached the parking authority as secondary context and constrained the story to an agenda-watch item rather than a completed policy update.",
+            "Source Scout attached the parking authority as secondary context and constrained the story to an agenda-watch item update while avoiding a completed policy.",
           query:
             "Nimble.search(query: New Brunswick parking authority downtown parking agenda discussion official source)",
         },
@@ -484,7 +484,7 @@ export const newBrunswickEdition = {
           agent: "Editor",
           status: "verified",
           detail:
-            "The editor kept the item because the event is useful to nearby residents, but framed it as possible increased activity rather than a verified disruption.",
+            "The editor kept the item because the event is useful to nearby residents, but framed it as possible increased activity disruption while avoiding a verified.",
           query:
             "Classify as publish, reject, needs_more_verification, or monitor_only using resident relevance and source support.",
         },

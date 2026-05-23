@@ -3,11 +3,11 @@
 import { motion } from "framer-motion";
 
 const STEPS = [
-  { n: "01", title: "Scout", body: "Agents discover and validate public sources for your area — city sites, county notices, transit alerts, agendas, schools, permits.", tool: "Nimble" },
+  { n: "01", title: "Scout", body: "Agents discover and validate public sources for your area , city sites, county notices, transit alerts, agendas, schools, permits.", tool: "Nimble" },
   { n: "02", title: "Monitor", body: "The desk passively checks each source, pulls live content, parses messy PDFs and calendars, watches for change.", tool: "Nimble" },
   { n: "03", title: "Remember", body: "Every snapshot, hash, and decision is written to a civic memory. The desk knows what changed since last time.", tool: "ClickHouse" },
   { n: "04", title: "Decide", body: "An editor agent filters administrative noise. A verifier checks claims against source text. A mentor reviews before press.", tool: "Editorial" },
-  { n: "05", title: "Publish", body: "Approved briefs are published as grounded, citeable civic micro-briefs — readable for residents, machine-readable for agents.", tool: "Senso · cited.md" },
+  { n: "05", title: "Publish", body: "Approved briefs are published as grounded, citeable civic micro-briefs , readable for residents, machine-readable for agents.", tool: "Senso · cited.md" },
   { n: "06", title: "Explain", body: "Every brief ships with what was checked, what was rejected, what was approved, and why. Every span is traced.", tool: "Datadog" },
 ];
 
@@ -173,7 +173,7 @@ export function HowItWorks() {
       <div className="relative z-10 max-w-[1400px] mx-auto px-6 md:px-10">
         <div className="mb-16 md:mb-24">
           <h3 className="uppercase mb-6 text-xs md:text-sm tracking-[0.22em] text-neutral-400">
-            § 02 — How it works
+            § 02 , How it works
           </h3>
           <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-[0.95] tracking-tight mb-6 max-w-4xl text-balance">
             The agents have already been running.

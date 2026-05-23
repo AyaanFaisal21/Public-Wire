@@ -34,7 +34,7 @@ export function Comparison() {
         <div className="grid lg:grid-cols-[1fr_1.2fr] gap-10 lg:gap-20 mb-16">
           <div>
             <h3 className="uppercase mb-6 text-xs md:text-sm tracking-[0.22em] text-neutral-500">
-              § 05 — Why it wins
+              § 05 , Why it wins
             </h3>
             <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-[0.92] tracking-tight text-balance">
               The convenience of a feed.<br />The discipline of a newsroom.
