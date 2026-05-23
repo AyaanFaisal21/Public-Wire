@@ -81,7 +81,7 @@ export async function nimbleRunCivicScan(params: {
         "Prioritize city notices, construction, road closures, public works, NJ Transit alerts, parking authority updates, Rutgers events, permits, and city council agendas. " +
         "Exclude rumors, private-person claims, unsupported crime claims, and opinion.",
       focus: "general",
-      searchDepth: "lite",
+      search_depth: "lite",
     });
 
     return {
