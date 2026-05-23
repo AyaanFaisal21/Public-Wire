@@ -4,7 +4,14 @@ import Image from "next/image";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 
-const AGENTS = [
+type AgentCard = {
+  name: string;
+  provider: string;
+  role: string;
+  reviewer?: boolean;
+};
+
+const AGENTS: AgentCard[] = [
   {
     name: "Source Scout",
     provider: "Nimble",
@@ -53,7 +60,7 @@ export function AgentSwarm() {
           <Image
             src="/images/spiral-circles.jpg"
             fill
-            alt="Abstract spiral network behind newsroom agents"
+            alt="Abstract spiral network behind civic intelligence agents"
             style={{ objectFit: "cover" }}
             className="brightness-[0.38] grayscale"
           />
@@ -65,7 +72,7 @@ export function AgentSwarm() {
         <div className="grid lg:grid-cols-[1fr_1.3fr] gap-10 lg:gap-20 mb-16">
           <div>
             <h3 className="uppercase mb-6 text-xs md:text-sm tracking-[0.22em] text-neutral-300">
-              § 06 , The newsroom
+              § 06, The chain
             </h3>
             <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-[0.92] tracking-tight text-balance">
               Five agent steps.<br />One inspectable chain.
@@ -78,30 +85,30 @@ export function AgentSwarm() {
           </p>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-white/30 border border-white/30">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-px bg-white/30 border border-white/30">
           {AGENTS.map((agent, idx) => (
             <motion.div
               key={agent.name}
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.5, delay: (idx % 6) * 0.04, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.5, delay: (idx % 5) * 0.04, ease: [0.22, 1, 0.36, 1] }}
               className="bg-black/60 backdrop-blur-sm p-6 md:p-7 group hover:bg-white hover:text-black transition-colors duration-500"
             >
               <div className="flex items-baseline justify-between mb-2">
                 <span className="text-[0.7rem] uppercase tracking-[0.18em] text-neutral-400 group-hover:text-neutral-600 transition-colors">
-                  Agent {String(idx + 1).padStart(2, "0")}
+                  Step {String(idx + 1).padStart(2, "0")}
                 </span>
                 <span className="text-[0.6rem] uppercase tracking-[0.15em] text-neutral-400 group-hover:text-neutral-600 transition-colors">
                   {agent.provider}
                 </span>
-                {agent.reviewer && (
-                  <span className="text-[0.6rem] uppercase tracking-[0.15em] px-1.5 py-0.5 bg-white text-black group-hover:bg-black group-hover:text-white transition-colors">
-                    Reviewer
-                  </span>
-                )}
               </div>
               <h3 className="text-2xl md:text-3xl font-bold mb-2">{agent.name}</h3>
+              {agent.reviewer && (
+                <span className="mb-3 inline-flex text-[0.6rem] uppercase tracking-[0.15em] px-1.5 py-0.5 bg-white text-black group-hover:bg-black group-hover:text-white transition-colors">
+                  Reviewer
+                </span>
+              )}
               <p className="text-sm text-neutral-300 group-hover:text-neutral-700 transition-colors leading-relaxed">
                 {agent.role}
               </p>
