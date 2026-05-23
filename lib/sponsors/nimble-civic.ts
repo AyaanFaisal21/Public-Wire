@@ -45,6 +45,7 @@ function buildSourcesFromSearch(raw: unknown, fallbackSources: LocalSource[]): L
 
 export async function nimbleRunCivicScan(params: {
   area: string;
+  requestedTopic?: string;
   fallbackSources: LocalSource[];
   fallbackChanges: LocalChange[];
 }): Promise<NimbleCivicResult> {
@@ -64,11 +65,12 @@ export async function nimbleRunCivicScan(params: {
   try {
     const nimble = new Nimble({ apiKey });
 
+    const requestedTopic = params.requestedTopic?.trim();
+
     const result = await nimble.search({
-      query:
-        `For ${params.area}, find official or public civic sources and recent resident-relevant updates. ` +
-        "Prioritize city notices, construction, road closures, public works, NJ Transit alerts, parking authority updates, Rutgers events, permits, and city council agendas. " +
-        "Exclude rumors, private-person claims, unsupported crime claims, and opinion.",
+      query: requestedTopic
+        ? `For ${params.area}, investigate this local civic topic or claim: "${requestedTopic}". Find official or public sources that support, contradict, or fail to corroborate it. Prioritize city notices, construction, road closures, public works, transit alerts, parking authority updates, school notices, permits, utility notices, city council agendas, agency pages, and local public records. Exclude private-person claims, unsupported crime claims, opinion, and speculation.`
+        : `For ${params.area}, find official or public civic sources and recent resident-relevant updates. Prioritize city notices, construction, road closures, public works, transit alerts, parking authority updates, school notices, permits, utility notices, and city council agendas. Exclude rumors, private-person claims, unsupported crime claims, and opinion.`,
       focus: "general",
       search_depth: "lite",
     });
@@ -77,7 +79,9 @@ export async function nimbleRunCivicScan(params: {
       provider: "Nimble",
       mode: "real-api",
       purpose:
-        "Real Nimble Search API call for live civic source discovery and resident-relevant update extraction.",
+        requestedTopic
+          ? "Real Nimble Search API call for requested-topic civic investigation."
+          : "Real Nimble Search API call for live civic source discovery and resident-relevant update extraction.",
       sources: buildSourcesFromSearch(result, params.fallbackSources),
       changes: buildChangesFromSearch(result, params.fallbackChanges),
       raw: result,

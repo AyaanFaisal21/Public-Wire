@@ -107,6 +107,32 @@ function sourcePacketForChange(change: LocalChange | undefined, sources: LocalSo
   }));
 }
 
+function buildRequestedTopicChange(params: {
+  area: string;
+  requestedTopic: string;
+  sourceId: string;
+}): LocalChange {
+  const { area, requestedTopic, sourceId } = params;
+  const place = shortArea(area);
+
+  return {
+    id: `requested_${slugify(area)}_${slugify(requestedTopic)}`,
+    sourceId,
+    title: `Requested topic under review: ${requestedTopic}`,
+    category: "city-agenda",
+    status: "new",
+    importance: "resident-relevant",
+    whatChanged: `A user searched "${requestedTopic}" in ${area}. LocalLens opened a source-backed investigation before treating the claim as fact.`,
+    whyItMatters: `Local claims can spread faster than official confirmation. This search gives ${place} residents a way to separate demand, evidence, and unsupported claims.`,
+    whoIsAffected: ["residents", "commuters", "families", "local businesses", "local officials"],
+    evidence: [
+      "User-initiated search topic created a requested-topic investigation.",
+      "Nimble searched public and official civic sources for corroboration.",
+      "Gemini reviewed whether the claim is resident-relevant, unsupported, routine, or publishable.",
+    ],
+  };
+}
+
 function buildDynamicBrief(params: {
   area: string;
   change: LocalChange | undefined;
@@ -188,17 +214,26 @@ export async function runLocalLensScan(params?: {
 
   const nimble = await traceStep(
     "nimble.civic_scan",
-    { area, slug, focus: focus.join(","), sponsor: "nimble" },
+    { area, slug, focus: focus.join(","), requested_topic: requestedTopic, sponsor: "nimble" },
     () =>
       nimbleRunCivicScan({
         area,
+        requestedTopic,
         fallbackSources: localSources,
         fallbackChanges: seededChanges,
       })
   );
 
-  const changes = nimble.changes.map((change) => localizeChangeForArea(change, area));
+  const baseChanges = nimble.changes.map((change) => localizeChangeForArea(change, area));
   const sources = nimble.sources.map((source) => localizeSourceForArea(source, area));
+  const requestedChange = requestedTopic
+    ? buildRequestedTopicChange({
+        area,
+        requestedTopic,
+        sourceId: sources[0]?.id || "nimble_live_search",
+      })
+    : null;
+  const changes = requestedChange ? [requestedChange, ...baseChanges] : baseChanges;
   const published = changes.filter((change) => change.status !== "rejected");
   const rejected = changes.filter((change) => change.status === "rejected");
 

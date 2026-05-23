@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowUpRight, ExternalLink, Newspaper, SearchCheck, Send } from "lucide-react";
@@ -17,6 +17,7 @@ type Props = {
   areaSlug: string;
   areaName: string;
   focus: string[];
+  initialQuery?: string;
 };
 
 type CoverageNotification = {
@@ -25,7 +26,7 @@ type CoverageNotification = {
   requestedTopic: string;
 };
 
-export function LocalEdition({ areaSlug, areaName, focus }: Props) {
+export function LocalEdition({ areaSlug, areaName, focus, initialQuery = "" }: Props) {
   const fallbackEdition = getEditionBySlug(areaSlug);
   const [edition, setEdition] = useState<LocalEditionDemo>(fallbackEdition);
   const topBrief = edition.briefs[0] ?? fallbackEdition.briefs[0];
@@ -37,6 +38,14 @@ export function LocalEdition({ areaSlug, areaName, focus }: Props) {
   const [liveLoaded, setLiveLoaded] = useState(false);
   const [coverageNotification, setCoverageNotification] =
     useState<CoverageNotification | null>(null);
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
+
+  async function runSearch(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const query = searchQuery.trim();
+    if (!query) return;
+    await runLiveSponsorScan(query);
+  }
 
   async function runLiveSponsorScan(requestedTopic?: string) {
     setLiveLoading(true);
@@ -134,6 +143,23 @@ export function LocalEdition({ areaSlug, areaName, focus }: Props) {
               ))}
             </div>
           )}
+
+          <form onSubmit={runSearch} className="mt-8 grid gap-3 md:grid-cols-[1fr_auto]">
+            <input
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              className="w-full border border-black/20 bg-white px-4 py-3 text-sm outline-none focus:border-black"
+              placeholder="Search any local topic or claim, like brown water near Washington Street or overnight parking rule change"
+            />
+            <button
+              type="submit"
+              disabled={liveLoading || !searchQuery.trim()}
+              className="btn-solid-dark disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <SearchCheck className="size-4" />
+              Search source trail
+            </button>
+          </form>
 
           <div className="mt-8 flex flex-wrap gap-3">
             <button
