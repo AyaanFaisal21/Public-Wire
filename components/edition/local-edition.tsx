@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { type CivicBrief, getEditionBySlug } from "@/content/local-lens-demo";
+import { type CivicBrief, type LocalEditionDemo, getEditionBySlug } from "@/content/local-lens-demo";
 
 type Props = {
   areaSlug: string;
@@ -20,11 +20,47 @@ type Props = {
 };
 
 export function LocalEdition({ areaSlug, areaName, focus }: Props) {
-  const edition = getEditionBySlug(areaSlug);
-  const topBrief = edition.briefs[0];
+  const fallbackEdition = getEditionBySlug(areaSlug);
+  const [edition, setEdition] = useState<LocalEditionDemo>(fallbackEdition);
+  const topBrief = edition.briefs[0] ?? fallbackEdition.briefs[0];
   const [selectedBrief, setSelectedBrief] = useState<CivicBrief | null>(null);
   const [requestOpen, setRequestOpen] = useState(false);
   const [requestSubmitted, setRequestSubmitted] = useState(false);
+  const [liveLoading, setLiveLoading] = useState(false);
+  const [liveError, setLiveError] = useState<string | null>(null);
+  const [liveLoaded, setLiveLoaded] = useState(false);
+
+  async function runLiveSponsorScan() {
+    setLiveLoading(true);
+    setLiveError(null);
+
+    try {
+      const response = await fetch("/api/local-lens/edition", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          area: areaName || edition.area,
+          slug: areaSlug,
+          focus,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.detail || data?.error || "Live scan failed");
+      }
+
+      setEdition(data.edition);
+      setLiveLoaded(true);
+    } catch (error) {
+      setLiveError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setLiveLoading(false);
+    }
+  }
 
   return (
     <div className="bg-white text-black">
@@ -90,7 +126,16 @@ export function LocalEdition({ areaSlug, areaName, focus }: Props) {
           )}
 
           <div className="mt-8 flex flex-wrap gap-3">
-            <button type="button" onClick={() => setSelectedBrief(topBrief)} className="btn-solid-dark">
+            <button
+              type="button"
+              onClick={runLiveSponsorScan}
+              disabled={liveLoading}
+              className="btn-solid-dark disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <SearchCheck className="size-4" />
+              {liveLoading ? "Running live scan..." : liveLoaded ? "Rerun live sponsor scan" : "Run live sponsor scan"}
+            </button>
+            <button type="button" onClick={() => setSelectedBrief(topBrief)} className="btn-outline-dark">
               <SearchCheck className="size-4" /> Investigate top brief
             </button>
             <button type="button" onClick={() => setRequestOpen(true)} className="btn-outline-dark">
@@ -99,6 +144,18 @@ export function LocalEdition({ areaSlug, areaName, focus }: Props) {
             <Link href={`/briefs/${topBrief.slug}`} className="btn-outline-dark">
               <Newspaper className="size-4" /> Open top brief
             </Link>
+          {liveError && (
+            <div className="mt-4 border border-red-500 bg-red-50 p-3 text-sm text-red-700">
+              Live scan failed. Showing fallback edition. {liveError}
+            </div>
+          )}
+
+          {liveLoaded && !liveError && (
+            <div className="mt-4 border border-emerald-600 bg-emerald-50 p-3 text-sm text-emerald-800">
+              Live sponsor-backed edition loaded from Nimble, Gemini, ClickHouse, Senso, and Lapdog trace data.
+            </div>
+          )}
+
           </div>
         </div>
       </section>
@@ -291,7 +348,7 @@ export function LocalEdition({ areaSlug, areaName, focus }: Props) {
 
       <section className="py-16 text-center">
         <p className="text-xs uppercase tracking-[0.22em] text-neutral-500">
-          End of edition · {areaSlug} · frontend demo content
+          End of edition · {areaSlug} · live sponsor scan enabled
         </p>
       </section>
 

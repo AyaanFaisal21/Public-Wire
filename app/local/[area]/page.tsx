@@ -6,7 +6,7 @@ import { getEditionBySlug } from "@/content/local-lens-demo";
 
 type AreaPageProps = {
   params: Promise<{ area: string }>;
-  searchParams: Promise<{ focus?: string }>;
+  searchParams: Promise<{ focus?: string; areaName?: string }>;
 };
 
 function prettifyArea(slug: string) {
@@ -28,9 +28,11 @@ export async function generateMetadata({ params }: AreaPageProps) {
 
 export default async function AreaPage({ params, searchParams }: AreaPageProps) {
   const { area } = await params;
-  const { focus } = await searchParams;
+  const { focus, areaName } = await searchParams;
   const focusList = focus ? focus.split(",") : [];
-  const pretty = getEditionBySlug(area).area || prettifyArea(area);
+  const pretty = areaName
+    ? decodeURIComponent(areaName)
+    : getEditionBySlug(area).area || prettifyArea(area);
 
   return (
     <>
