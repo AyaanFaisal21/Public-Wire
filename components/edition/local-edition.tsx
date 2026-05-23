@@ -246,7 +246,7 @@ export function LocalEdition({ areaSlug, areaName, focus }: Props) {
               </ol>
               <div className="mt-8 pt-6 border-t border-white/15">
                 <div className="text-[0.7rem] uppercase tracking-[0.22em] text-neutral-400 mb-2">
-                  Mentor review
+                  Reliability review
                 </div>
                 <p className="text-sm text-neutral-200 leading-relaxed">{topBrief.mentorReview}</p>
               </div>
@@ -631,7 +631,7 @@ function InvestigationDialog({
 
                 <div className="mt-8 border-t border-white/15 pt-6">
                   <div className="text-[0.65rem] uppercase tracking-[0.2em] text-neutral-400 mb-3">
-                    Mentor review
+                    Reliability review
                   </div>
                   <p className="text-sm leading-relaxed text-neutral-200">{brief.mentorReview}</p>
                 </div>

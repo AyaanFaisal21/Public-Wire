@@ -149,7 +149,7 @@ function mapRejected(change: ScanChange): RejectedItem {
 function publicAgentName(source: string) {
   if (source === "Nimble") return "Source Scout";
   if (source === "ClickHouse") return "Change Ledger";
-  if (source === "Editorial Agent") return "Editorial Agent";
+  if (source === "Google Gemini") return "Editorial Agent";
   if (source === "Senso") return "Grounding Agent";
   if (source === "Datadog Lapdog") return "Reliability Reviewer";
   return source;
@@ -158,7 +158,7 @@ function publicAgentName(source: string) {
 function publicAgentTool(source: string) {
   if (source === "Nimble") return "Nimble civic source discovery";
   if (source === "ClickHouse") return "ClickHouse audit ledger";
-  if (source === "Editorial Agent") return "Gemini editorial decision";
+  if (source === "Google Gemini") return "Gemini editorial decision";
   if (source === "Senso") return "Senso grounding";
   if (source === "Datadog Lapdog") return "Datadog Lapdog trace review";
   return source;
@@ -204,14 +204,14 @@ function buildInvestigationTrace(scan: ScanResult, change: ScanChange) {
     time: now,
     agent: publicAgentName(event.source),
     status:
-      event.source === "Editorial Agent" || event.source === "Senso"
+      event.source === "Google Gemini" || event.source === "Senso"
         ? ("verified" as const)
         : ("checked" as const),
     detail: event.detail,
     query:
       event.source === "Nimble"
         ? `Find official/public civic updates for ${scan.area}.`
-        : event.source === "Editorial Agent"
+        : event.source === "Google Gemini"
           ? `Evaluate whether "${change.title}" is resident-relevant, source-backed, and publishable.`
           : event.source === "Senso"
             ? `Ground "${scan.brief.headline}" against LocalLens organization context.`

@@ -6,7 +6,7 @@ const STEPS = [
   { n: "01", title: "Scout", body: "Agents discover and validate public sources for your area , city sites, county notices, transit alerts, agendas, schools, permits.", tool: "Nimble" },
   { n: "02", title: "Monitor", body: "The desk passively checks each source, pulls live content, parses messy PDFs and calendars, watches for change.", tool: "Nimble" },
   { n: "03", title: "Remember", body: "Every snapshot, hash, and decision is written to a civic memory. The desk knows what changed since last time.", tool: "ClickHouse" },
-  { n: "04", title: "Decide", body: "An editor agent filters administrative noise. A verifier checks claims against source text. A mentor reviews before press.", tool: "Editorial" },
+  { n: "04", title: "Decide", body: "An editor agent filters administrative noise. A verifier checks claims against source text. A reliability reviews before press.", tool: "Editorial" },
   { n: "05", title: "Publish", body: "Approved briefs are published as grounded, citeable civic micro-briefs , readable for residents, machine-readable for agents.", tool: "Senso · cited.md" },
   { n: "06", title: "Explain", body: "Every brief ships with what was checked, what was rejected, what was approved, and why. Every span is traced.", tool: "Datadog" },
 ];

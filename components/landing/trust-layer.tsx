@@ -17,7 +17,7 @@ const AUDIT_LINES = [
   "Rejected 5 routine administrative updates.",
   "Verified street, dates, and affected groups against official source.",
   "Classified resident-relevant , affects downtown transportation.",
-  "Mentor approved. No unsupported claims. No speculation.",
+  "Reliability review passed. No unsupported claims. No speculation.",
   "Published a cited micro-brief and added trace.",
 ];
 
@@ -35,7 +35,7 @@ const PRINCIPLES = [
     body: "Routine filings, duplicated pages, stale posts, and unsupported items are not hidden. Readers can see what was filtered out and why.",
   },
   {
-    title: "Mentor review",
+    title: "Reliability review",
     body: "A separate reviewer agent judges the reporting chain before publication, checking source quality, uncertainty, unsupported claims, and wording.",
   },
 ];
@@ -53,7 +53,7 @@ export function TrustLayer() {
           </h2>
           <p className="text-lg md:text-2xl text-neutral-300 leading-snug font-light italic text-balance max-w-3xl">
             Each entry ships with the sources it used, what was rejected, what the
-            mentor agent said, and a plain-English trace of how the story was made,
+            reliability reviewer said, and a plain-English trace of how the story was made,
             with the option to look deeper.
           </p>
           <p className="mt-6 max-w-2xl border-l border-white/30 pl-4 text-sm md:text-base uppercase tracking-[0.08em] text-neutral-400">
@@ -111,7 +111,7 @@ export function TrustLayer() {
 
             <div className="mt-8 pt-6 border-t border-white/15">
               <div className="text-[0.7rem] uppercase tracking-[0.22em] text-neutral-400 mb-2">
-                Mentor review
+                Reliability review
               </div>
               <p className="text-sm md:text-base text-neutral-200 italic leading-relaxed">
                 &ldquo;Approved. The entry uses an official city source, does not

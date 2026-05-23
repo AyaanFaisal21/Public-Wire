@@ -5,18 +5,32 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 
 const AGENTS = [
-  { name: "Area Mapper", role: "Resolves a search into the right civic layers , state, county, city, neighborhood, campus, services." },
-  { name: "Source Scout", role: "Finds and validates official and public sources for the area." },
-  { name: "Source Monitor", role: "Repeatedly checks each source for new posts, edits, removals, and date shifts." },
-  { name: "Extractor", role: "Turns hostile civic web pages and PDFs into structured civic events." },
-  { name: "Change Detector", role: "Diffs current snapshots against memory. Knows what is new, stale, duplicate, or updated." },
-  { name: "Editor", role: "Filters routine administrative noise. Keeps what affects residents." },
-  { name: "Verifier", role: "Checks each claim against source text and blocks unsupported wording." },
-  { name: "Writer", role: "Drafts the brief from verified facts only. Never invents." },
-  { name: "Mentor", role: "Reviews the reporting agents’ work , sources, claims, behavior , before publication.", reviewer: true },
-  { name: "Publisher", role: "Posts approved briefs to the LocalLens edition and to the public cited artifact." },
-  { name: "Audit Translator", role: "Turns raw agent traces into the plain-English “how this story was made” log." },
-  { name: "Update Agent", role: "Keeps published briefs current as sources change after publication." },
+  {
+    name: "Source Scout",
+    provider: "Nimble",
+    role: "Searches public civic surfaces for official and public updates tied to the selected area.",
+  },
+  {
+    name: "Change Ledger",
+    provider: "ClickHouse",
+    role: "Stores scan events, metrics, request demand, rejected items, and publication history.",
+  },
+  {
+    name: "Editorial Agent",
+    provider: "Gemini",
+    role: "Evaluates whether a detected civic change is resident-relevant, routine, unsupported, or publishable.",
+  },
+  {
+    name: "Grounding Agent",
+    provider: "Senso",
+    role: "Grounds the brief against source context before it appears in the local edition.",
+  },
+  {
+    name: "Reliability Reviewer",
+    provider: "Datadog Lapdog",
+    role: "Traces the agent chain and helps expose weak claims, missing support, and reliability issues.",
+    reviewer: true,
+  },
 ];
 
 export function AgentSwarm() {

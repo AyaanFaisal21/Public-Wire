@@ -16,7 +16,7 @@ const COMPARISONS = [
   {
     option: "Social feeds",
     problem: "Fast, but noisy, unverified, and easy to detach from the original public record.",
-    localLens: "Each brief includes source links, verification status, rejected items, audit logs, and mentor review.",
+    localLens: "Each brief includes source links, verification status, rejected items, audit logs, and reliability review.",
   },
   {
     option: "Traditional local news",

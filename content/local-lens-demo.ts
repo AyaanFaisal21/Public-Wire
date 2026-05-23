@@ -253,7 +253,7 @@ export const newBrunswickEdition = {
       investigationTrace: [
         {
           time: "8:40:12",
-          agent: "Source Monitor",
+          agent: "Source Scout",
           status: "checked",
           detail:
             "Datadog trace shows the monitor opening the municipal source registry, checking the city notices endpoint, and recording a changed page hash against the previous run.",
@@ -262,7 +262,7 @@ export const newBrunswickEdition = {
         },
         {
           time: "8:40:20",
-          agent: "Extractor",
+          agent: "Source Scout",
           status: "checked",
           detail:
             "The extractor converted the notice into a civic event object, separating the location, notice type, affected corridor, likely audience, and source text used for support.",
@@ -271,7 +271,7 @@ export const newBrunswickEdition = {
         },
         {
           time: "8:40:31",
-          agent: "Verifier",
+          agent: "Editorial Agent",
           status: "verified",
           detail:
             "The verifier checked every sentence in the proposed brief against the extracted source fields and rejected a draft phrase that implied exact traffic delays.",
@@ -281,7 +281,7 @@ export const newBrunswickEdition = {
         },
         {
           time: "8:41:08",
-          agent: "Mentor",
+          agent: "Reliability Reviewer",
           status: "verified",
           detail:
             "The mentor approved publication because the item was resident-relevant, sourced from official context, and worded as a cautious transportation heads-up prediction while avoiding a.",
@@ -290,12 +290,12 @@ export const newBrunswickEdition = {
         },
         {
           time: "8:42:00",
-          agent: "Publisher",
+          agent: "Grounding Agent",
           status: "published",
           detail:
             "The publisher attached source links, audit summary, update history, and the cited.md demo artifact label before placing the brief into the New Brunswick edition.",
           query:
-            "Publish approved civic micro-brief with source packet, mentor review, audit trail, and update policy.",
+            "Publish approved civic micro-brief with source packet, reliability review, audit trail, and update policy.",
         },
       ],
     },
@@ -341,7 +341,7 @@ export const newBrunswickEdition = {
       investigationTrace: [
         {
           time: "8:40:12",
-          agent: "Source Monitor",
+          agent: "Source Scout",
           status: "checked",
           detail:
             "The monitor detected a new agenda item in the municipal meeting source and recorded that the page changed from the previous snapshot.",
@@ -350,7 +350,7 @@ export const newBrunswickEdition = {
         },
         {
           time: "8:40:18",
-          agent: "Extractor",
+          agent: "Source Scout",
           status: "checked",
           detail:
             "The extractor found a parking-related topic but could not confirm whether it represented a final policy change, a discussion item, or an informational hearing.",
@@ -359,7 +359,7 @@ export const newBrunswickEdition = {
         },
         {
           time: "8:40:24",
-          agent: "Verifier",
+          agent: "Editorial Agent",
           status: "needs-evidence",
           detail:
             "The verifier refused the first draft because the claim was too strong. The source supported 'agenda includes discussion' but not 'parking fees are changing.'",
@@ -387,7 +387,7 @@ export const newBrunswickEdition = {
         },
         {
           time: "8:40:44",
-          agent: "Verifier",
+          agent: "Editorial Agent",
           status: "verified",
           detail:
             "The verifier approved a revised claim: the agenda includes a downtown parking discussion. The published brief now avoids saying a change has been enacted.",
@@ -397,7 +397,7 @@ export const newBrunswickEdition = {
         },
         {
           time: "8:41:02",
-          agent: "Mentor",
+          agent: "Reliability Reviewer",
           status: "published",
           detail:
             "The mentor approved publication as a monitoring item and required the article to signal that follow-up is needed after the meeting.",
@@ -453,7 +453,7 @@ export const newBrunswickEdition = {
       investigationTrace: [
         {
           time: "8:40:10",
-          agent: "Source Monitor",
+          agent: "Source Scout",
           status: "checked",
           detail:
             "The monitor found a campus-area public event listing and attached it to the College Avenue layer because that layer affects nearby residents and local access.",
@@ -462,7 +462,7 @@ export const newBrunswickEdition = {
         },
         {
           time: "8:40:22",
-          agent: "Extractor",
+          agent: "Source Scout",
           status: "checked",
           detail:
             "The extractor converted the listing into an event object and separated confirmed facts from likely but unconfirmed local effects.",
@@ -471,7 +471,7 @@ export const newBrunswickEdition = {
         },
         {
           time: "8:40:35",
-          agent: "Verifier",
+          agent: "Editorial Agent",
           status: "needs-evidence",
           detail:
             "The verifier found no official transportation advisory, so the system blocked language implying traffic disruption and kept only a campus-area heads-up.",
@@ -490,7 +490,7 @@ export const newBrunswickEdition = {
         },
         {
           time: "8:41:20",
-          agent: "Mentor",
+          agent: "Reliability Reviewer",
           status: "published",
           detail:
             "The mentor approved publication because the uncertainty is explicit, the source is public, and the brief does not overstate the impact.",
@@ -527,49 +527,49 @@ export const newBrunswickEdition = {
     },
     {
       step: 2,
-      agent: "Source Monitor",
+      agent: "Source Scout",
       tool: "Nimble draft integration",
       action: "Checked twelve public source targets.",
       result: "Twenty-eight source surfaces were scanned; slower source families were queued for retry and did not block publication.",
     },
     {
       step: 3,
-      agent: "Extractor",
+      agent: "Source Scout",
       tool: "Structured civic schema",
       action: "Converted source text into candidate civic updates.",
       result: "Twelve candidates created; nine routine/noisy items flagged.",
     },
     {
       step: 4,
-      agent: "Change Detector",
+      agent: "Change Ledger",
       tool: "ClickHouse draft ledger",
       action: "Compared candidate updates with previous snapshot hashes.",
       result: "Three meaningful changes kept for editorial review.",
     },
     {
       step: 5,
-      agent: "Editor + Verifier",
+      agent: "Editorial Agent",
       tool: "Grounding policy",
       action: "Filtered for resident impact and source support.",
       result: "Three publishable briefs, three visible rejections, no unsupported claims.",
     },
     {
       step: 6,
-      agent: "Writer",
+      agent: "Grounding Agent",
       tool: "Brief template",
       action: "Generated short local newspaper entries.",
       result: "Each brief includes summary, why it matters, affected groups, and sources.",
     },
     {
       step: 7,
-      agent: "Mentor",
+      agent: "Reliability Reviewer",
       tool: "Public editor review",
       action: "Reviewed source quality, claims, and wording before publication.",
       result: "All demo briefs approved; two require follow-up monitoring.",
     },
     {
       step: 8,
-      agent: "Publisher + Audit Translator",
+      agent: "Grounding Agent + Reliability Reviewer",
       tool: "cited.md and Datadog draft layers",
       action: "Published the edition view and translated the agent trace.",
       result: "Reader-facing audit logs and demo citation labels attached.",

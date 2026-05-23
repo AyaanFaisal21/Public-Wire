@@ -147,7 +147,7 @@ export default async function BriefPage({ params }: BriefPageProps) {
                 How the agents decided this was fit to publish.
               </p>
               <p className="text-base md:text-lg text-neutral-300 leading-relaxed">
-                The audit translator reads the raw agent traces and explains what each
+                The reliability trace reads raw agent events and explains what each
                 agent did. The actual prompts and source queries are preserved in italics.
               </p>
             </div>
@@ -192,7 +192,7 @@ export default async function BriefPage({ params }: BriefPageProps) {
 
         <section className="border-b border-black/10 bg-neutral-50">
           <div className="max-w-[1100px] mx-auto px-6 md:px-10 py-14 grid lg:grid-cols-2 gap-10">
-            <BriefSection title="Mentor Review">
+            <BriefSection title="Reliability Reviewer Review">
               <p>{brief.mentorReview}</p>
             </BriefSection>
 
