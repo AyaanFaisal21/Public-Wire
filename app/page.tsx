@@ -2,7 +2,47 @@
 
 import { useState } from "react";
 
-type ErrandEvent = {
+type LocalSource = {
+  id: string;
+  name: string;
+  url: string;
+  category: string;
+  sourceType: string;
+};
+
+type LocalChange = {
+  id: string;
+  sourceId: string;
+  title: string;
+  category: string;
+  status: string;
+  importance: string;
+  whatChanged: string;
+  whyItMatters: string;
+  whoIsAffected: string[];
+  evidence: string[];
+  rejectionReason?: string;
+};
+
+type CivicBrief = {
+  id: string;
+  headline: string;
+  area: string;
+  category: string;
+  confidence: string;
+  status: string;
+  summary: string;
+  whyItMatters: string;
+  whoIsAffected: string[];
+  sources: {
+    title: string;
+    url: string;
+    role: string;
+  }[];
+  agentTrace: string[];
+};
+
+type AgentEvent = {
   step: number;
   title: string;
   detail: string;
@@ -11,208 +51,294 @@ type ErrandEvent = {
   status: string;
 };
 
-type Field = {
-  field: string;
-  answer: string;
-  provenance: string;
-  confidence: string;
-};
-
-type DemoResult = {
+type ScanResult = {
   sessionId: string;
-  transcript: string;
-  patient: Record<string, string>;
-  events: ErrandEvent[];
-  fields: Field[];
+  area: string;
+  lastChecked: string;
+  sources: LocalSource[];
+  changes: LocalChange[];
+  published: LocalChange[];
+  rejected: LocalChange[];
+  brief: CivicBrief;
+  events: AgentEvent[];
   metrics: Record<string, number>;
-  finalMessage: string;
+  clickhouse: {
+    enabled: boolean;
+    message?: string;
+    reason?: string;
+  };
+  sponsorStack: Record<string, { provider: string; role: string }>;
 };
-
-const defaultCommand =
-  "I need to fill out my neurology intake form, but I do not remember all the dates.";
 
 function badgeClass(value: string) {
-  if (value === "high") return "bg-red-100 text-red-800 border-red-200";
-  if (value === "medium") return "bg-yellow-100 text-yellow-800 border-yellow-200";
-  if (value === "review") return "bg-purple-100 text-purple-800 border-purple-200";
-  if (value === "needs_confirmation") return "bg-blue-100 text-blue-800 border-blue-200";
-  return "bg-emerald-100 text-emerald-800 border-emerald-200";
+  if (value === "resident-relevant" || value === "high" || value === "published") {
+    return "border-emerald-200 bg-emerald-100 text-emerald-800";
+  }
+  if (value === "routine" || value === "rejected") {
+    return "border-zinc-200 bg-zinc-100 text-zinc-700";
+  }
+  if (value === "medium" || value === "new") {
+    return "border-blue-200 bg-blue-100 text-blue-800";
+  }
+  return "border-black/10 bg-white text-black/60";
+}
+
+function readableKey(key: string) {
+  return key.replace(/([A-Z])/g, " $1").replace(/^./, (c) => c.toUpperCase());
 }
 
 export default function Home() {
-  const [command, setCommand] = useState(defaultCommand);
-  const [result, setResult] = useState<DemoResult | null>(null);
+  const [result, setResult] = useState<ScanResult | null>(null);
   const [loading, setLoading] = useState(false);
 
-  async function startDemo() {
+  async function runScan() {
     setLoading(true);
-    const res = await fetch("/api/errand/start", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ command }),
-    });
+    const res = await fetch("/api/local-lens/scan", { method: "POST" });
     const data = await res.json();
     setResult(data);
     setLoading(false);
-
-    if ("speechSynthesis" in window && data.finalMessage) {
-      const utterance = new SpeechSynthesisUtterance(data.finalMessage);
-      utterance.rate = 0.95;
-      window.speechSynthesis.cancel();
-      window.speechSynthesis.speak(utterance);
-    }
   }
 
   return (
-    <main className="min-h-screen bg-[#f6f2ea] text-[#1f1a17]">
+    <main className="min-h-screen bg-[#f4f1ea] text-[#1d1b18]">
       <section className="mx-auto flex max-w-7xl flex-col gap-8 px-6 py-8">
         <header className="rounded-[2rem] border border-black/10 bg-white p-8 shadow-sm">
-          <div className="mb-4 inline-flex rounded-full border border-black/10 bg-[#f6f2ea] px-3 py-1 text-sm font-medium">
-            RecallForm MVP
+          <div className="mb-5 flex flex-wrap gap-2">
+            <span className="rounded-full border border-black/10 bg-[#f4f1ea] px-3 py-1 text-sm font-semibold">
+              LocalLens
+            </span>
+            <span className="rounded-full border border-black/10 bg-[#f4f1ea] px-3 py-1 text-sm font-semibold">
+              Autonomous civic change monitor
+            </span>
           </div>
-          <h1 className="max-w-4xl text-5xl font-semibold tracking-tight">
-            Voice-guided medical forms for patients who cannot type easily or rely on memory.
+
+          <h1 className="max-w-5xl text-5xl font-semibold tracking-tight md:text-7xl">
+            Your neighborhood, monitored by agents.
           </h1>
-          <p className="mt-4 max-w-3xl text-lg text-black/65">
-            RecallForm reads confusing intake forms, explains each question in plain language,
-            fills answers from verified patient context, and flags uncertainty before a clinician sees it.
+
+          <p className="mt-5 max-w-3xl text-lg text-black/65">
+            LocalLens watches public city pages, meeting agendas, transit alerts,
+            construction notices, school updates, permits, and event calendars, then
+            publishes short cited briefs when something meaningful changes.
           </p>
+
+          <div className="mt-8 grid gap-3 md:grid-cols-3">
+            <div className="rounded-2xl border border-black/10 bg-[#fbfaf7] p-4">
+              <div className="text-sm font-semibold">Nimble</div>
+              <p className="mt-1 text-sm text-black/60">
+                Discovers and extracts structured facts from messy civic web sources.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-black/10 bg-[#fbfaf7] p-4">
+              <div className="text-sm font-semibold">ClickHouse</div>
+              <p className="mt-1 text-sm text-black/60">
+                Stores source snapshots, diffs, decisions, and source health over time.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-black/10 bg-[#fbfaf7] p-4">
+              <div className="text-sm font-semibold">Senso / cited.md</div>
+              <p className="mt-1 text-sm text-black/60">
+                Turns verified findings into grounded public civic briefs.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <div className="flex-1 rounded-2xl border border-black/10 bg-[#fbfaf7] px-5 py-4 text-black/60">
+              New Brunswick, NJ
+            </div>
+            <button
+              onClick={runScan}
+              disabled={loading}
+              className="rounded-2xl bg-black px-6 py-4 font-semibold text-white disabled:opacity-50"
+            >
+              {loading ? "Scanning civic sources..." : "Run LocalLens scan"}
+            </button>
+          </div>
         </header>
 
-        <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-          <section className="rounded-[2rem] border border-black/10 bg-white p-6 shadow-sm">
-            <h2 className="text-2xl font-semibold">Patient voice command</h2>
-            <p className="mt-2 text-sm text-black/60">
-              Demo path: neurology intake form, memory difficulty, red-flag fall response.
-            </p>
-
-            <textarea
-              className="mt-5 h-36 w-full rounded-2xl border border-black/10 bg-[#fbfaf7] p-4 text-base outline-none focus:border-black/30"
-              value={command}
-              onChange={(e) => setCommand(e.target.value)}
-            />
-
-            <button
-              onClick={startDemo}
-              disabled={loading}
-              className="mt-4 w-full rounded-2xl bg-black px-5 py-4 text-lg font-semibold text-white disabled:opacity-50"
-            >
-              {loading ? "Running intake..." : "Start voice intake simulation"}
-            </button>
-
-            {result && (
-              <div className="mt-6 rounded-2xl border border-black/10 bg-[#f6f2ea] p-4">
-                <h3 className="font-semibold">Spoken response</h3>
-                <p className="mt-2 text-black/70">{result.finalMessage}</p>
-              </div>
-            )}
-          </section>
-
-          <section className="rounded-[2rem] border border-black/10 bg-white p-6 shadow-sm">
-            <h2 className="text-2xl font-semibold">Verified patient context</h2>
-            <p className="mt-2 text-sm text-black/60">
-              Senso layer: verified memory the patient does not need to repeat.
-            </p>
-
-            <div className="mt-5 grid gap-3 sm:grid-cols-2">
-              {result ? (
-                Object.entries(result.patient).map(([key, value]) => (
-                  <div key={key} className="rounded-2xl border border-black/10 bg-[#fbfaf7] p-4">
-                    <div className="text-xs uppercase tracking-wide text-black/40">
-                      {key.replaceAll(/([A-Z])/g, " $1")}
-                    </div>
-                    <div className="mt-1 font-medium">{value}</div>
-                  </div>
-                ))
-              ) : (
-                <div className="rounded-2xl border border-dashed border-black/20 bg-[#fbfaf7] p-6 text-black/50 sm:col-span-2">
-                  Run the simulation to load verified context.
-                </div>
-              )}
-            </div>
-          </section>
-        </div>
-
         {result && (
-          <div className="grid gap-6 lg:grid-cols-[1fr_0.9fr]">
-            <section className="rounded-[2rem] border border-black/10 bg-white p-6 shadow-sm">
-              <h2 className="text-2xl font-semibold">Live intake timeline</h2>
-              <p className="mt-2 text-sm text-black/60">
-                ClickHouse layer: every question, answer, risk gate, and repair event becomes structured state.
-              </p>
+          <>
+            <section className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+              <div className="rounded-[2rem] border border-black/10 bg-white p-6 shadow-sm">
+                <h2 className="text-2xl font-semibold">{result.area}</h2>
+                <p className="mt-2 text-sm text-black/60">
+                  Civic briefing generated {result.lastChecked}
+                </p>
 
-              <div className="mt-6 space-y-4">
-                {result.events.map((event) => (
-                  <div key={event.step} className="rounded-2xl border border-black/10 bg-[#fbfaf7] p-4">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-black text-sm font-bold text-white">
-                        {event.step}
-                      </span>
-                      <h3 className="font-semibold">{event.title}</h3>
-                      <span className={`rounded-full border px-2 py-1 text-xs ${badgeClass(event.risk)}`}>
-                        {event.risk}
-                      </span>
-                      <span className={`rounded-full border px-2 py-1 text-xs ${badgeClass(event.status)}`}>
-                        {event.status}
-                      </span>
-                      <span className="rounded-full border border-black/10 bg-white px-2 py-1 text-xs">
-                        {event.source}
-                      </span>
-                    </div>
-                    <p className="mt-3 text-sm text-black/65">{event.detail}</p>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            <aside className="space-y-6">
-              <section className="rounded-[2rem] border border-black/10 bg-white p-6 shadow-sm">
-                <h2 className="text-2xl font-semibold">Form completion</h2>
                 <div className="mt-5 grid grid-cols-2 gap-3">
                   {Object.entries(result.metrics).map(([key, value]) => (
                     <div key={key} className="rounded-2xl border border-black/10 bg-[#fbfaf7] p-4">
                       <div className="text-3xl font-semibold">{value}</div>
                       <div className="mt-1 text-xs uppercase tracking-wide text-black/45">
-                        {key.replaceAll(/([A-Z])/g, " $1")}
+                        {readableKey(key)}
                       </div>
                     </div>
                   ))}
                 </div>
-              </section>
 
-              <section className="rounded-[2rem] border border-red-200 bg-red-50 p-6 shadow-sm">
-                <h2 className="text-2xl font-semibold text-red-900">Verifier intervention</h2>
-                <p className="mt-3 text-red-900/75">
-                  The agent tried to continue after the patient mentioned waking up on the floor.
-                  The protocol blocked the next question and required fall follow-ups before completion.
+                <div className="mt-5 rounded-2xl border border-black/10 bg-[#fbfaf7] p-4">
+                  <div className="text-sm font-semibold">ClickHouse ledger</div>
+                  <p className="mt-2 text-sm text-black/60">
+                    {result.clickhouse.enabled
+                      ? result.clickhouse.message
+                      : result.clickhouse.message || result.clickhouse.reason}
+                  </p>
+                </div>
+              </div>
+
+              <div className="rounded-[2rem] border border-black/10 bg-white p-6 shadow-sm">
+                <h2 className="text-2xl font-semibold">Today’s briefing</h2>
+                <p className="mt-2 text-sm text-black/60">
+                  Meaningful updates detected across public sources.
                 </p>
-              </section>
-            </aside>
-          </div>
-        )}
 
-        {result && (
-          <section className="rounded-[2rem] border border-black/10 bg-white p-6 shadow-sm">
-            <h2 className="text-2xl font-semibold">Completed fields with provenance</h2>
-            <p className="mt-2 text-sm text-black/60">
-              Differentiator: every answer is labeled by source, confidence, and review status.
-            </p>
+                <div className="mt-5 space-y-4">
+                  {result.published.map((change) => (
+                    <article key={change.id} className="rounded-2xl border border-black/10 bg-[#fbfaf7] p-5">
+                      <div className="flex flex-wrap gap-2">
+                        <span className={`rounded-full border px-2 py-1 text-xs ${badgeClass(change.importance)}`}>
+                          {change.importance}
+                        </span>
+                        <span className={`rounded-full border px-2 py-1 text-xs ${badgeClass(change.status)}`}>
+                          {change.status}
+                        </span>
+                        <span className="rounded-full border border-black/10 bg-white px-2 py-1 text-xs">
+                          {change.category}
+                        </span>
+                      </div>
+                      <h3 className="mt-3 text-xl font-semibold">{change.title}</h3>
+                      <p className="mt-2 text-sm text-black/65">
+                        <strong>What changed:</strong> {change.whatChanged}
+                      </p>
+                      <p className="mt-2 text-sm text-black/65">
+                        <strong>Why it matters:</strong> {change.whyItMatters}
+                      </p>
+                    </article>
+                  ))}
+                </div>
+              </div>
+            </section>
 
-            <div className="mt-6 grid gap-4 md:grid-cols-2">
-              {result.fields.map((field) => (
-                <div key={field.field} className="rounded-2xl border border-black/10 bg-[#fbfaf7] p-4">
-                  <div className="text-sm font-semibold text-black/50">{field.field}</div>
-                  <div className="mt-1 text-lg font-semibold">{field.answer}</div>
-                  <div className="mt-3 text-sm text-black/60">
-                    <strong>Source:</strong> {field.provenance}
+            <section className="rounded-[2rem] border border-black/10 bg-white p-6 shadow-sm">
+              <h2 className="text-2xl font-semibold">Published civic brief</h2>
+              <p className="mt-2 text-sm text-black/60">
+                This is the public artifact LocalLens creates.
+              </p>
+
+              <div className="mt-5 rounded-2xl border border-black/10 bg-[#fbfaf7] p-6">
+                <div className="flex flex-wrap gap-2">
+                  <span className="rounded-full border border-emerald-200 bg-emerald-100 px-2 py-1 text-xs text-emerald-800">
+                    {result.brief.confidence} confidence
+                  </span>
+                  <span className="rounded-full border border-blue-200 bg-blue-100 px-2 py-1 text-xs text-blue-800">
+                    {result.brief.status}
+                  </span>
+                  <span className="rounded-full border border-black/10 bg-white px-2 py-1 text-xs">
+                    {result.brief.category}
+                  </span>
+                </div>
+
+                <h3 className="mt-4 text-3xl font-semibold">{result.brief.headline}</h3>
+                <p className="mt-4 text-black/70">{result.brief.summary}</p>
+
+                <div className="mt-5 grid gap-4 md:grid-cols-2">
+                  <div className="rounded-2xl border border-black/10 bg-white p-4">
+                    <h4 className="font-semibold">Why it matters</h4>
+                    <p className="mt-2 text-sm text-black/60">{result.brief.whyItMatters}</p>
                   </div>
-                  <div className="mt-1 text-sm text-black/60">
-                    <strong>Confidence:</strong> {field.confidence}
+                  <div className="rounded-2xl border border-black/10 bg-white p-4">
+                    <h4 className="font-semibold">Who may be affected</h4>
+                    <p className="mt-2 text-sm text-black/60">
+                      {result.brief.whoIsAffected.join(", ")}
+                    </p>
                   </div>
                 </div>
-              ))}
-            </div>
-          </section>
+
+                <div className="mt-5">
+                  <h4 className="font-semibold">Sources</h4>
+                  <div className="mt-3 grid gap-3 md:grid-cols-2">
+                    {result.brief.sources.map((source) => (
+                      <div key={source.title} className="rounded-2xl border border-black/10 bg-white p-4">
+                        <div className="font-semibold">{source.title}</div>
+                        <p className="mt-2 text-sm text-black/60">{source.role}</p>
+                        <p className="mt-2 truncate text-xs text-black/40">{source.url}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section className="grid gap-6 lg:grid-cols-[1fr_1fr]">
+              <div className="rounded-[2rem] border border-black/10 bg-white p-6 shadow-sm">
+                <h2 className="text-2xl font-semibold">Agent console</h2>
+                <p className="mt-2 text-sm text-black/60">
+                  What the autonomous civic desk checked, detected, rejected, and published.
+                </p>
+
+                <div className="mt-5 space-y-4">
+                  {result.events.map((event) => (
+                    <div key={event.step} className="rounded-2xl border border-black/10 bg-[#fbfaf7] p-4">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-black text-sm font-bold text-white">
+                          {event.step}
+                        </span>
+                        <h3 className="font-semibold">{event.title}</h3>
+                        <span className="rounded-full border border-black/10 bg-white px-2 py-1 text-xs">
+                          {event.source}
+                        </span>
+                      </div>
+                      <p className="mt-3 text-sm text-black/65">{event.detail}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <section className="rounded-[2rem] border border-black/10 bg-white p-6 shadow-sm">
+                  <h2 className="text-2xl font-semibold">Rejected items</h2>
+                  <div className="mt-5 space-y-3">
+                    {result.rejected.map((change) => (
+                      <div key={change.id} className="rounded-2xl border border-black/10 bg-[#fbfaf7] p-4">
+                        <div className="font-semibold">{change.title}</div>
+                        <p className="mt-2 text-sm text-black/60">
+                          {change.rejectionReason}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="rounded-[2rem] border border-black/10 bg-white p-6 shadow-sm">
+                  <h2 className="text-2xl font-semibold">Sources monitored</h2>
+                  <div className="mt-5 space-y-3">
+                    {result.sources.map((source) => (
+                      <div key={source.id} className="rounded-2xl border border-black/10 bg-[#fbfaf7] p-4">
+                        <div className="font-semibold">{source.name}</div>
+                        <div className="mt-1 text-xs uppercase tracking-wide text-black/40">
+                          {source.category} · {source.sourceType}
+                        </div>
+                        <p className="mt-2 truncate text-xs text-black/40">{source.url}</p>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              </div>
+            </section>
+
+            <section className="rounded-[2rem] border border-black/10 bg-white p-6 shadow-sm">
+              <h2 className="text-2xl font-semibold">Sponsor stack proof</h2>
+              <div className="mt-5 grid gap-3 md:grid-cols-4">
+                {Object.values(result.sponsorStack).map((sponsor) => (
+                  <div key={sponsor.provider} className="rounded-2xl border border-black/10 bg-[#fbfaf7] p-4">
+                    <div className="font-semibold">{sponsor.provider}</div>
+                    <p className="mt-2 text-sm text-black/60">{sponsor.role}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </>
         )}
       </section>
     </main>
