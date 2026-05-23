@@ -7,7 +7,7 @@ export async function POST() {
     return NextResponse.json(result);
   } catch (error) {
     return NextResponse.json(
-      { error: "Failed to run PublicWire scan", detail: String(error) },
+      { error: "Failed to run LocalLens scan", detail: String(error) },
       { status: 500 }
     );
   }

@@ -77,9 +77,9 @@ export function LocalEdition({ areaSlug, areaName, focus }: Props) {
       <section className="border-b border-black/10">
         <div className="max-w-[1400px] mx-auto px-6 md:px-10 pt-16 md:pt-20 pb-12">
           <div className="flex items-baseline gap-3 mb-8 text-[0.7rem] md:text-xs uppercase tracking-[0.22em] text-neutral-500">
-            <span>PublicWire {edition.area || areaName}</span>
+            <span>LocalLens {edition.area || areaName}</span>
             <span className="flex-1 h-px bg-black/15 max-w-[200px]" />
-            <span>Live demo edition</span>
+            <span>Live civic edition edition</span>
           </div>
 
           <div className="grid lg:grid-cols-[1fr_380px] gap-8 lg:gap-14 items-end">

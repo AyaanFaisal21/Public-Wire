@@ -18,7 +18,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ edition, scan });
   } catch (error) {
     return NextResponse.json(
-      { error: "Failed to generate PublicWire edition", detail: String(error) },
+      { error: "Failed to generate LocalLens edition", detail: String(error) },
       { status: 500 }
     );
   }

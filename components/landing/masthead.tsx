@@ -22,7 +22,7 @@ export function Masthead({ variant = "solid" }: Props) {
           href="/"
           className={`${textColor} text-sm uppercase tracking-[0.04em]`}
         >
-          PublicWire
+          LocalLens
         </Link>
         <nav className="flex gap-6 md:gap-10">
           <Link

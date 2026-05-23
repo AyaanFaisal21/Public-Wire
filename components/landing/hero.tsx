@@ -58,7 +58,7 @@ export function Hero() {
                       "0 0 6px rgba(255,255,255,0.65), 0 0 18px rgba(255,255,255,0.38), 0 2px 10px rgba(0,0,0,0.9), 0 4px 24px rgba(0,0,0,0.75)",
                   }}
                 >
-                  PublicWire is a self-running local newspaper. An agent swarm
+                  LocalLens is a self-running local newspaper. An agent swarm
                   monitors public city sites, county notices, transit alerts,
                   agendas, and event calendars — and publishes short, cited briefs
                   when something actually changes for the people who live there.

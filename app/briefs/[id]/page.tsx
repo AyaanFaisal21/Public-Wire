@@ -21,12 +21,12 @@ export async function generateMetadata({ params }: BriefPageProps) {
 
   if (!brief) {
     return {
-      title: "Brief not found - PublicWire",
+      title: "Brief not found - LocalLens",
     };
   }
 
   return {
-    title: `${brief.headline} - PublicWire`,
+    title: `${brief.headline} - LocalLens`,
     description: brief.summary,
   };
 }

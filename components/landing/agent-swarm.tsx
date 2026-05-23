@@ -14,7 +14,7 @@ const AGENTS = [
   { name: "Verifier", role: "Checks each claim against source text and blocks unsupported wording." },
   { name: "Writer", role: "Drafts the brief from verified facts only. Never invents." },
   { name: "Mentor", role: "Reviews the reporting agents’ work — sources, claims, behavior — before publication.", reviewer: true },
-  { name: "Publisher", role: "Posts approved briefs to the PublicWire edition and to the public cited artifact." },
+  { name: "Publisher", role: "Posts approved briefs to the LocalLens edition and to the public cited artifact." },
   { name: "Audit Translator", role: "Turns raw agent traces into the plain-English “how this story was made” log." },
   { name: "Update Agent", role: "Keeps published briefs current as sources change after publication." },
 ];
@@ -58,7 +58,7 @@ export function AgentSwarm() {
             </h2>
           </div>
           <p className="text-lg md:text-2xl text-neutral-200 leading-snug font-light text-balance self-end max-w-2xl">
-            PublicWire treats the swarm like a small civic newsroom: one agent scouts,
+            LocalLens treats the swarm like a small civic newsroom: one agent scouts,
             one watches sources, one verifies, one writes, and one acts like a public
             editor. They behave like different employees at a press desk, each with a
             narrow job and a handoff the next person can inspect.
