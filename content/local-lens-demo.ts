@@ -521,7 +521,7 @@ export const newBrunswickEdition = {
     {
       step: 1,
       agent: "Area Coverage",
-      tool: "LocalLens registry",
+      tool: "PublicWire registry",
       action: "Loaded the New Brunswick edition and civic layers.",
       result: "Municipal, county, transit, campus, parking, and event layers selected.",
     },

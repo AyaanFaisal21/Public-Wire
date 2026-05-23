@@ -131,7 +131,7 @@ export function TrustLayer() {
               Don&apos;t just trust the paper. Inspect how the paper thinks.
             </h3>
             <p className="text-base md:text-lg text-neutral-700 leading-relaxed">
-              LocalLens is designed so readers can examine the editorial philosophy
+              PublicWire is designed so readers can examine the editorial philosophy
               behind each live edition: what the agents watch, what they reject,
               what they verify, and where uncertainty remains.
             </p>

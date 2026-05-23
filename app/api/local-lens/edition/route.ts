@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { runLocalLensScan } from "@/lib/local-lens-agent";
+import { runPublicWireScan } from "@/lib/local-lens-agent";
 import { toLocalEditionDemo } from "@/lib/local-lens-edition-adapter";
 
 export async function POST(request: Request) {
@@ -12,13 +12,13 @@ export async function POST(request: Request) {
       ? String(body.requestedTopic).trim()
       : undefined;
 
-    const scan = await runLocalLensScan({ area, slug, focus, requestedTopic });
+    const scan = await runPublicWireScan({ area, slug, focus, requestedTopic });
     const edition = toLocalEditionDemo(scan, slug);
 
     return NextResponse.json({ edition, scan });
   } catch (error) {
     return NextResponse.json(
-      { error: "Failed to generate LocalLens edition", detail: String(error) },
+      { error: "Failed to generate PublicWire edition", detail: String(error) },
       { status: 500 }
     );
   }

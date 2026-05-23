@@ -102,7 +102,7 @@ export function SearchDialog({ trigger, large = false }: SearchDialogProps) {
             Find your local edition
           </DialogTitle>
           <DialogDescription className="text-base text-neutral-600">
-            LocalLens runs a civic desk for your area. Tell us where you live and what you care about.
+            PublicWire runs a civic desk for your area. Tell us where you live and what you care about.
           </DialogDescription>
         </DialogHeader>
 
