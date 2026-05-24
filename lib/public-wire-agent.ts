@@ -32,66 +32,21 @@ function isNewBrunswick(area: string) {
 function localizeSourceForArea(source: LocalSource, area: string): LocalSource {
   if (isNewBrunswick(area)) return source;
 
-  const place = shortArea(area);
-  const areaSlug = slugify(area);
-
   if (source.id === "nimble_live_search") {
     return {
       ...source,
-      name: source.name.replace("Nimble live civic web search", `Nimble live civic web search for ${area}`),
+      name: source.name.includes(area)
+        ? source.name
+        : source.name.replace("Nimble live civic web search", `Nimble live civic web search for ${area}`),
     };
   }
 
-  return {
-    ...source,
-    id: `${areaSlug}_${source.id}`,
-    name: source.name
-      .replaceAll("New Brunswick", place)
-      .replaceAll("Rutgers", `${place} area`)
-      .replaceAll("Middlesex County", `${place} regional`),
-    url: "Nimble Search API result",
-    sourceType: "public",
-  };
+  return source;
 }
 
 function localizeChangeForArea(change: LocalChange, area: string): LocalChange {
   if (isNewBrunswick(area)) return change;
-
-  const place = shortArea(area);
-  const areaSlug = slugify(area);
-  const category = titleCase(change.category);
-
-  const titleByCategory: Record<string, string> = {
-    transportation: `${place} transportation update may affect local access`,
-    construction: `${place} public works update may affect local travel`,
-    "city-agenda": `${place} local agenda includes a resident-facing policy item`,
-    event: `${place} public event may affect local foot traffic`,
-    school: `${place} school notice may affect families`,
-  };
-
-  return {
-    ...change,
-    id: `${areaSlug}_${change.id}`,
-    sourceId: `${areaSlug}_${change.sourceId}`,
-    title: titleByCategory[change.category] || `${place} civic update may affect residents`,
-    whatChanged: `The live scan found a resident-facing ${category.toLowerCase()} update for ${area} and queued it for civic review.`,
-    whyItMatters: `${category} updates can affect residents, commuters, students, families, workers, visitors, and local businesses depending on timing and location.`,
-    whoIsAffected:
-      change.whoIsAffected.length > 0
-        ? change.whoIsAffected.map((group) =>
-            group
-              .replaceAll("Rutgers students", "students")
-              .replaceAll("Rutgers", `${place} area`)
-              .replaceAll("Downtown", "local")
-          )
-        : ["residents", "commuters", "local businesses"],
-    evidence: change.evidence.map((item) =>
-      item
-        .replaceAll("New Brunswick", place)
-        .replaceAll("George Street", `${place} downtown corridor`)
-        .replaceAll("Rutgers", `${place} area`)
-    ),
-  };
+  return change;
 }
 
 function sourcePacketForChange(change: LocalChange | undefined, sources: LocalSource[]): CivicBrief["sources"] {
