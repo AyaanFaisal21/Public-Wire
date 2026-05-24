@@ -6,7 +6,7 @@ import { getEditionBySlug } from "@/content/public-wire-content";
 
 type AreaPageProps = {
   params: Promise<{ area: string }>;
-  searchParams: Promise<{ focus?: string; areaName?: string; q?: string; query?: string }>;
+  searchParams: Promise<{ focus?: string; areaName?: string; q?: string; query?: string; live?: string }>;
 };
 
 function prettifyArea(slug: string) {
@@ -28,19 +28,26 @@ export async function generateMetadata({ params }: AreaPageProps) {
 
 export default async function AreaPage({ params, searchParams }: AreaPageProps) {
   const { area } = await params;
-  const { focus, areaName, q, query } = await searchParams;
+  const { focus, areaName, q, query, live } = await searchParams;
   const focusList = focus ? focus.split(",") : [];
   const pretty = areaName
     ? decodeURIComponent(areaName)
     : getEditionBySlug(area).area || prettifyArea(area);
   const initialQuery = q || query || "";
+  const autoRun = live === "1" || live === "true";
 
   return (
     <>
       <LenisProvider />
       <Masthead variant="solid" />
       <main>
-        <PublicWireEdition areaSlug={area} areaName={pretty} focus={focusList} initialQuery={initialQuery} />
+        <PublicWireEdition
+          areaSlug={area}
+          areaName={pretty}
+          focus={focusList}
+          initialQuery={initialQuery}
+          autoRun={autoRun}
+        />
       </main>
       <Colophon />
     </>

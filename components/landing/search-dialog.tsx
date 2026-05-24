@@ -61,9 +61,11 @@ export function SearchDialog({ trigger, large = false }: SearchDialogProps) {
     );
   }
 
-  function go(slug: string) {
+  function go(slug: string, label?: string) {
     const params = new URLSearchParams();
     if (selectedInterests.length) params.set("focus", selectedInterests.join(","));
+    if (label) params.set("areaName", label);
+    params.set("live", "1");
     setOpen(false);
     router.push(`/local/${slug}${params.toString() ? `?${params.toString()}` : ""}`);
   }
@@ -75,7 +77,7 @@ export function SearchDialog({ trigger, large = false }: SearchDialogProps) {
     const matched = SUGGESTED_AREAS.find(
       (a) => a.label.toLowerCase() === trimmed.toLowerCase(),
     );
-    go(matched?.slug || slugify(trimmed));
+    go(matched?.slug || slugify(trimmed), matched?.label || trimmed);
   }
 
   const defaultTrigger = (

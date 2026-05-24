@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowUpRight, ExternalLink, Newspaper, SearchCheck, Send } from "lucide-react";
@@ -18,6 +18,7 @@ type Props = {
   areaName: string;
   focus: string[];
   initialQuery?: string;
+  autoRun?: boolean;
 };
 
 type CoverageNotification = {
@@ -26,7 +27,13 @@ type CoverageNotification = {
   requestedTopic: string;
 };
 
-export function PublicWireEdition({ areaSlug, areaName, focus, initialQuery = "" }: Props) {
+export function PublicWireEdition({
+  areaSlug,
+  areaName,
+  focus,
+  initialQuery = "",
+  autoRun = false,
+}: Props) {
   const fallbackEdition = getEditionBySlug(areaSlug);
   const [edition, setEdition] = useState<PublicWireEdition>(fallbackEdition);
   const topBrief = edition.briefs[0] ?? fallbackEdition.briefs[0];
@@ -39,6 +46,7 @@ export function PublicWireEdition({ areaSlug, areaName, focus, initialQuery = ""
   const [coverageNotification, setCoverageNotification] =
     useState<CoverageNotification | null>(null);
   const [searchQuery, setSearchQuery] = useState(initialQuery);
+  const autoRunStarted = useRef(false);
 
   async function runSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -80,6 +88,12 @@ export function PublicWireEdition({ areaSlug, areaName, focus, initialQuery = ""
       setLiveLoading(false);
     }
   }
+
+  useEffect(() => {
+    if (!autoRun || autoRunStarted.current) return;
+    autoRunStarted.current = true;
+    void runLiveSponsorScan(initialQuery.trim() || undefined);
+  }, [autoRun, initialQuery]);
 
   return (
     <div className="bg-white text-black">
