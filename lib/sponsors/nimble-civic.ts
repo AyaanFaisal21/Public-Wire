@@ -1,5 +1,5 @@
 import Nimble from "@nimble-way/nimble-js";
-import type { LocalChange, LocalSource } from "@/lib/local-lens-data";
+import type { LocalChange, LocalSource } from "@/lib/public-wire-data";
 
 type NimbleCivicResult = {
   provider: "Nimble";
@@ -91,7 +91,7 @@ export async function nimbleRunCivicScan(params: {
       provider: "Nimble",
       mode: "api-error-fallback",
       purpose:
-        "Nimble Search API call failed, so LocalLens fell back to seeded civic source data for demo continuity.",
+        "Nimble Search API call failed, so PublicWire fell back to seeded civic source data for demo continuity.",
       sources: params.fallbackSources,
       changes: params.fallbackChanges,
       error: String(error),

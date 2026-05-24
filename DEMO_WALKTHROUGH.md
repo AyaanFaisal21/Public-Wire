@@ -2,7 +2,7 @@
 
 The single sentence everything orbits:
 
-> **LocalLens is not a chatbot that writes local news. It is an autonomous civic newsroom that checks public sources, decides what matters, verifies it, publishes it, and shows its work.**
+> **PublicWire is not a chatbot that writes local news. It is an autonomous civic newsroom that checks public sources, decides what matters, verifies it, publishes it, and shows its work.**
 
 That sentence is the spine. Every beat below serves it.
 
@@ -55,7 +55,7 @@ The five things the judges should walk away believing:
 - Let the *Problem* section come into frame. Pause for one second on *"Public information, privately ignored."*
 
 **Closer**
-> "LocalLens turns that scattered public information into a self-running local newspaper."
+> "PublicWire turns that scattered public information into a self-running local newspaper."
 
 ---
 
@@ -109,7 +109,7 @@ This is the demo's centerpiece. Slow down. This is the beat that wins the prize.
   - `Mentor — published` — *"Required follow-up after the meeting."*
 
 **The line that wins the prize**
-> "Most AI systems would have either published this unverified or silently dropped it. LocalLens caught the unsupported claim, sent it back for more evidence, and only published a cautious version once the source actually backed it. **This is what a hallucination looks like in our system — caught, not published.**"
+> "Most AI systems would have either published this unverified or silently dropped it. PublicWire caught the unsupported claim, sent it back for more evidence, and only published a cautious version once the source actually backed it. **This is what a hallucination looks like in our system — caught, not published.**"
 
 Pause for one beat after that sentence.
 
@@ -133,7 +133,7 @@ Do **not** open a separate sponsor section. Stay inside the Investigate dialog a
 ### 2:40–3:00 — Close
 
 **Voice line**
-> "LocalLens is civic infrastructure. Autonomous agents monitor public sources, produce readable local updates, and expose the evidence trail. It makes local information easier to find, harder to fake, and more useful to residents."
+> "PublicWire is civic infrastructure. Autonomous agents monitor public sources, produce readable local updates, and expose the evidence trail. It makes local information easier to find, harder to fake, and more useful to residents."
 
 **Final sentence — say it slowly, then stop**
 > "**It is a newspaper where the newsroom is made of agents, and every story ships with its receipts.**"
@@ -196,7 +196,7 @@ If the room is running over and you're at the 2:00 mark with no Investigate beat
 ## Single-sentence backup pitches
 
 If you only get 30 seconds with a judge in the hallway:
-> "LocalLens is an autonomous civic newsroom — agents monitor public sources, verify claims, and publish short cited briefs. Every story ships with its receipts."
+> "PublicWire is an autonomous civic newsroom — agents monitor public sources, verify claims, and publish short cited briefs. Every story ships with its receipts."
 
 If you only get 10:
 > "It's a self-running local newspaper made of agents that show their work."

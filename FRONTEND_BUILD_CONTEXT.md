@@ -1,12 +1,12 @@
 # Frontend Build Context
 
-This branch is **frontend + dummy demo only**. No backend, no sponsor integrations, no API routes. Everything renders from typed static demo data in `content/local-lens-demo.ts`. Sponsor adapters, ClickHouse client, and the agent pipeline will be reintroduced later via a separate backend merge.
+This branch is **frontend + dummy demo only**. No backend, no sponsor integrations, no API routes. Everything renders from typed static demo data in `content/public-wire-demo.ts`. Sponsor adapters, ClickHouse client, and the agent pipeline will be reintroduced later via a separate backend merge.
 
 ---
 
 ## What this repo contains
 
-A polished, scroll-based Next.js 16 site for **LocalLens** — a self-running local civic newspaper. Three routes: a landing, a local-edition page per area, and a per-brief detail page. All UI is stark black-and-white, full-bleed, scroll-driven, and intentionally newspaper-shaped.
+A polished, scroll-based Next.js 16 site for **PublicWire** — a self-running local civic newspaper. Three routes: a landing, a local-edition page per area, and a per-brief detail page. All UI is stark black-and-white, full-bleed, scroll-driven, and intentionally newspaper-shaped.
 
 ### Stack
 
@@ -25,7 +25,7 @@ A polished, scroll-based Next.js 16 site for **LocalLens** — a self-running lo
 | Path | File | What it is |
 |---|---|---|
 | `/` | `app/page.tsx` | The scroll-based landing. Composes Hero → Problem → How It Works → Trust Layer → Comparison → Agent Swarm → Closing CTA → Colophon, wrapped in `<LenisProvider />`. |
-| `/local/[area]` | `app/local/[area]/page.tsx` | The civic edition page for an area slug. Uses `generateMetadata` and `getEditionBySlug` from `content/local-lens-demo.ts`. Renders `<LocalEdition />` with the static demo edition for that slug. |
+| `/local/[area]` | `app/local/[area]/page.tsx` | The civic edition page for an area slug. Uses `generateMetadata` and `getEditionBySlug` from `content/public-wire-demo.ts`. Renders `<PublicWireEdition />` with the static demo edition for that slug. |
 | `/briefs/[id]` | `app/briefs/[id]/page.tsx` | Individual published-brief detail. Uses `generateStaticParams` against `demoEditions` so every demo brief slug is statically built. |
 
 There is **no API route** in this branch — every page is statically renderable from the content layer.
@@ -73,7 +73,7 @@ Defined in `app/globals.css`. Worth knowing:
 | `problem.tsx` | NewUIPotential-style Featured split: editorial text left, full-bleed grayscale image right. |
 | `how-it-works.tsx` | Six-step black grid. Each card flips white-on-hover with framer-motion `whileInView` stagger. |
 | `trust-layer.tsx` | B&W split. Sample published brief left (with trust fields), public audit log + mentor review on black right. |
-| `comparison.tsx` | Pitch-positioning section — LocalLens vs. the alternatives. |
+| `comparison.tsx` | Pitch-positioning section — PublicWire vs. the alternatives. |
 | `agent-swarm.tsx` | The visual peak. `clip-path: polygon(0% 0, 100% 0%, 100% 100%, 0 100%)` window with a `fixed`-positioned spiral image inside, framer-motion y-parallax on the image, and 12 newsroom-agent cards layered over a dark overlay. Mentor agent carries a `REVIEWER` badge. |
 | `closing-cta.tsx` | Black-on-white finale. *"Read what just changed in your town."* Single solid-dark CTA into the search dialog. |
 | `colophon.tsx` | The peel-up footer. Same clip-path trick as agent-swarm, plus `sticky` positioning inside an oversized parent so the footer peels up from below as the user scrolls. Giant `LLENS` wordmark, pulsing red `LIVE — Agents hard at work` dot, Desk/Editions/Tooling columns. |
@@ -81,7 +81,7 @@ Defined in `app/globals.css`. Worth knowing:
 
 ### `components/edition/` — edition page
 
-- **`local-edition.tsx`** — Renders the area page interior. Calls `getEditionBySlug(areaSlug)` from `content/local-lens-demo.ts` and lays out: dateline, edition queue, focus chips, action row, top story section, brief grid, rejected items, agent console, sources panel. Includes an Investigate dialog (per-brief detective trace) and a "News you want to see" request dialog. **No fetching — every byte is from static content.**
+- **`local-edition.tsx`** — Renders the area page interior. Calls `getEditionBySlug(areaSlug)` from `content/public-wire-demo.ts` and lays out: dateline, edition queue, focus chips, action row, top story section, brief grid, rejected items, agent console, sources panel. Includes an Investigate dialog (per-brief detective trace) and a "News you want to see" request dialog. **No fetching — every byte is from static content.**
 
 ### `components/ui/` — shadcn primitives
 
@@ -93,11 +93,11 @@ Global fade-in on every route change.
 
 ---
 
-## Content layer (`content/local-lens-demo.ts`)
+## Content layer (`content/public-wire-demo.ts`)
 
 The single source of truth for the demo. Exports:
 
-- **`LocalEditionDemo`** — the shape of a complete edition (area, slug, lastChecked, metrics, sources, briefs, rejectedItems, agentEvents)
+- **`PublicWireEdition`** — the shape of a complete edition (area, slug, lastChecked, metrics, sources, briefs, rejectedItems, agentEvents)
 - **`CivicBrief`** — a full brief including `investigationTrace[]` (the detective work shown in the Investigate dialog)
 - **`newBrunswickEdition`** — the canonical, hand-crafted demo edition
 - **`demoEditions`** — a Record keyed by slug. New Brunswick is the authored one; Newark, Jersey City, Middlesex County, and Rutgers/College Ave are produced by `cloneEdition()` (which adapts headlines, source names, and metrics)
@@ -147,9 +147,9 @@ Every route gets a soft fade-in on entry via `<PageTransition>` in `app/layout.t
 - `Media/` — orphan duplicates of files already in `public/images/`.
 - `INTEGRATION.md` — the sponsor wiring checklist (now redundant with the dedicated sponsor doc).
 - `.env.example` — sponsor credentials no longer needed in this branch.
-- `lib/clickhouse.ts`, `lib/local-lens-agent.ts`, `lib/local-lens-data.ts`, `lib/sponsors/*` — all server-side helpers (the surviving `lib/utils.ts` is the UI `cn()` helper).
-- `app/api/local-lens/scan/route.ts` — the API LocalEdition used to call. Replaced by direct content-layer reads.
-- Three reference folders from earlier iterations: `LocalLens/`, `LocalLensInitialUI/`, `NewUIPotential/`.
+- `lib/clickhouse.ts`, `lib/public-wire-agent.ts`, `lib/public-wire-data.ts`, `lib/sponsors/*` — all server-side helpers (the surviving `lib/utils.ts` is the UI `cn()` helper).
+- `app/api/public-wire/scan/route.ts` — the API PublicWireEdition used to call. Replaced by direct content-layer reads.
+- Three reference folders from earlier iterations: `PublicWire/`, `PublicWireInitialUI/`, `NewUIPotential/`.
 - Old errand-demo legacy: `app/api/errand/`, `app/mock/`, `lib/errand-agent.ts`, `lib/demo-data.ts`.
 - Empty `hooks/` directory.
 - Unused dependencies from `package.json`: `@clickhouse/client`, `uuid`, `zod`, `tw-animate-css`.

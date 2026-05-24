@@ -6,22 +6,22 @@ const COMPARISONS = [
   {
     option: "Raw government sites",
     problem: "Accurate but scattered, slow to search, and written for compliance instead of residents.",
-    localLens: "One readable paper across state, county, city, transit, school, campus, and neighborhood layers.",
+    publicWire: "One readable paper across state, county, city, transit, school, campus, and neighborhood layers.",
   },
   {
     option: "Search engines",
     problem: "Good for finding pages, weak at remembering what changed and why it matters locally.",
-    localLens: "Agents monitor sources over time, compare snapshots, and surface only meaningful civic changes.",
+    publicWire: "Agents monitor sources over time, compare snapshots, and surface only meaningful civic changes.",
   },
   {
     option: "Social feeds",
     problem: "Fast, but noisy, unverified, and easy to detach from the original public record.",
-    localLens: "Each brief includes source links, verification status, rejected items, audit logs, and reliability review.",
+    publicWire: "Each brief includes source links, verification status, rejected items, audit logs, and reliability review.",
   },
   {
     option: "Traditional local news",
     problem: "Valuable but thinly staffed; many civic updates never become articles.",
-    localLens: "A self-running civic desk can watch routine source layers continuously and escalate what matters.",
+    publicWire: "A self-running civic desk can watch routine source layers continuously and escalate what matters.",
   },
 ];
 
@@ -42,7 +42,7 @@ export function Comparison() {
           </div>
           <div className="self-end">
             <p className="text-lg md:text-2xl text-neutral-700 leading-snug font-light text-balance mb-8">
-              LocalLens is built for civic information that lives across layers. It
+              PublicWire is built for civic information that lives across layers. It
               does not ask residents to know which agency owns a problem before they
               can understand what changed.
             </p>
@@ -82,9 +82,9 @@ export function Comparison() {
                 </div>
                 <div className="border-t border-black pt-3">
                   <div className="text-[0.65rem] uppercase tracking-[0.16em] text-black mb-2">
-                    LocalLens
+                    PublicWire
                   </div>
-                  <p className="text-sm text-neutral-900 leading-relaxed">{item.localLens}</p>
+                  <p className="text-sm text-neutral-900 leading-relaxed">{item.publicWire}</p>
                 </div>
               </div>
             </motion.article>

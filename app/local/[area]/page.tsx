@@ -1,8 +1,8 @@
 import { Masthead } from "@/components/landing/masthead";
 import { Colophon } from "@/components/landing/colophon";
 import { LenisProvider } from "@/components/landing/lenis-provider";
-import { LocalEdition } from "@/components/edition/local-edition";
-import { getEditionBySlug } from "@/content/local-lens-demo";
+import { PublicWireEdition } from "@/components/edition/public-wire-edition";
+import { getEditionBySlug } from "@/content/public-wire-content";
 
 type AreaPageProps = {
   params: Promise<{ area: string }>;
@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: AreaPageProps) {
   const edition = getEditionBySlug(area);
   const pretty = edition.area || prettifyArea(area);
   return {
-    title: `LocalLens ${pretty} , Today's Civic Briefing`,
+    title: `PublicWire ${pretty} , Today's Civic Briefing`,
     description: `Self-running civic newsroom for ${pretty}. Agent-monitored. Source-cited. Reliability Reviewer-reviewed.`,
   };
 }
@@ -40,7 +40,7 @@ export default async function AreaPage({ params, searchParams }: AreaPageProps) 
       <LenisProvider />
       <Masthead variant="solid" />
       <main>
-        <LocalEdition areaSlug={area} areaName={pretty} focus={focusList} initialQuery={initialQuery} />
+        <PublicWireEdition areaSlug={area} areaName={pretty} focus={focusList} initialQuery={initialQuery} />
       </main>
       <Colophon />
     </>

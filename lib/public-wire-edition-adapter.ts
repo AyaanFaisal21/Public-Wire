@@ -2,9 +2,9 @@ import type {
   AgentEvent,
   CivicBrief,
   CivicSource,
-  LocalEditionDemo,
+  PublicWireEdition,
   RejectedItem,
-} from "@/content/local-lens-demo";
+} from "@/content/public-wire-content";
 
 type ScanSource = {
   id: string;
@@ -214,7 +214,7 @@ function buildInvestigationTrace(scan: ScanResult, change: ScanChange) {
         : event.source === "Google Gemini"
           ? `Evaluate whether "${change.title}" is resident-relevant, source-backed, and publishable.`
           : event.source === "Senso"
-            ? `Ground "${scan.brief.headline}" against LocalLens organization context.`
+            ? `Ground "${scan.brief.headline}" against PublicWire organization context.`
             : undefined,
     technicalConfidence:
       index === 4 && scan.googleEditorial ? String(scan.metrics.confidenceScore / 100) : undefined,
@@ -269,7 +269,7 @@ function mapBrief(scan: ScanResult, change: ScanChange, index: number): CivicBri
           ? "Resident impact"
           : "Civic signal",
     priorityReason: isRequested
-      ? "Reader demand crossed the threshold, so LocalLens opened an investigation without treating the repeated claim as fact."
+      ? "Reader demand crossed the threshold, so PublicWire opened an investigation without treating the repeated claim as fact."
       : isLead
         ? scan.googleEditorial?.decision.reason ||
           "Leads the edition because it passed the live editorial and reliability gates."
@@ -296,7 +296,7 @@ function mapBrief(scan: ScanResult, change: ScanChange, index: number): CivicBri
       ? "Demand is high enough to investigate, but repeated requests are used as an investigation trigger. The claim remains unverified until Nimble/Gemini find public or official corroboration."
       : scan.lapdogReview?.verdict ||
         scan.googleEditorial?.decision.reason ||
-        "Approved by the live LocalLens reliability gate.",
+        "Approved by the live PublicWire reliability gate.",
     updateHistory: [
       `${scan.lastChecked} - Generated from live sponsor-backed scan ${scan.sessionId}.`,
       scan.publishing?.citationId
@@ -306,12 +306,12 @@ function mapBrief(scan: ScanResult, change: ScanChange, index: number): CivicBri
     artifactLabel:
       scan.publishing?.publishedUrl ||
       scan.publishing?.citationId ||
-      `LocalLens live artifact: ${id}`,
+      `PublicWire live artifact: ${id}`,
     investigationTrace: buildInvestigationTrace(scan, change),
   };
 }
 
-export function toLocalEditionDemo(scan: ScanResult, slug?: string): LocalEditionDemo {
+export function toPublicWireEdition(scan: ScanResult, slug?: string): PublicWireEdition {
   const publishedChanges = scan.published.length > 0 ? scan.published : scan.changes.filter((c) => c.status !== "rejected");
 
   return {

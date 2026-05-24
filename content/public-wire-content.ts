@@ -58,7 +58,7 @@ export type RejectedItem = {
   reason: string;
 };
 
-export type LocalEditionDemo = {
+export type PublicWireEdition = {
   area: string;
   slug: string;
   lastChecked: string;
@@ -521,7 +521,7 @@ export const newBrunswickEdition = {
     {
       step: 1,
       agent: "Area Coverage",
-      tool: "LocalLens registry",
+      tool: "PublicWire registry",
       action: "Loaded the New Brunswick edition and civic layers.",
       result: "Municipal, county, transit, campus, parking, and event layers selected.",
     },
@@ -575,7 +575,7 @@ export const newBrunswickEdition = {
       result: "Reader-facing audit logs and demo citation labels attached.",
     },
   ] satisfies AgentEvent[],
-} satisfies LocalEditionDemo;
+} satisfies PublicWireEdition;
 
 function prettifySlug(slug: string) {
   return slug
@@ -595,7 +595,7 @@ function cloneEdition(params: {
   sourcesMonitored?: number;
   routineItemsRejected?: number;
   civicLayers?: number;
-}): LocalEditionDemo {
+}): PublicWireEdition {
   return {
     ...newBrunswickEdition,
     slug: params.slug,
@@ -624,10 +624,10 @@ function cloneEdition(params: {
       category: index === 0 ? params.topCategory : brief.category,
       artifactLabel: `cited.md demo artifact: seeded_${params.slug}_${brief.slug}`,
     })),
-  } satisfies LocalEditionDemo;
+  } satisfies PublicWireEdition;
 }
 
-export const demoEditions: Record<string, LocalEditionDemo> = {
+export const demoEditions: Record<string, PublicWireEdition> = {
   "new-brunswick": newBrunswickEdition,
   newark: cloneEdition({
     slug: "newark",
@@ -679,7 +679,7 @@ export const demoEditions: Record<string, LocalEditionDemo> = {
   }),
 };
 
-export function getEditionBySlug(slug: string): LocalEditionDemo {
+export function getEditionBySlug(slug: string): PublicWireEdition {
   return demoEditions[slug] ?? cloneEdition({
     slug,
     area: prettifySlug(slug),

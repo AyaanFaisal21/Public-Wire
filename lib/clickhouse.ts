@@ -30,7 +30,7 @@ export async function ensureClickHouseTables() {
 
   await client.exec({
     query: `
-      CREATE TABLE IF NOT EXISTS locallens_events (
+      CREATE TABLE IF NOT EXISTS publicwire_events (
         session_id String,
         step UInt32,
         title String,
@@ -47,7 +47,7 @@ export async function ensureClickHouseTables() {
 
   await client.exec({
     query: `
-      CREATE TABLE IF NOT EXISTS locallens_metrics (
+      CREATE TABLE IF NOT EXISTS publicwire_metrics (
         session_id String,
         metric String,
         value Float64,
@@ -78,7 +78,7 @@ export async function logRecallFormRun(params: {
   const now = new Date().toISOString();
 
   await client.insert({
-    table: "locallens_events",
+    table: "publicwire_events",
     values: params.events.map((event) => ({
       session_id: params.sessionId,
       step: event.step,
@@ -93,7 +93,7 @@ export async function logRecallFormRun(params: {
   });
 
   await client.insert({
-    table: "locallens_metrics",
+    table: "publicwire_metrics",
     values: Object.entries(params.metrics).map(([metric, value]) => ({
       session_id: params.sessionId,
       metric,

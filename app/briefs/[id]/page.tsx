@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { Colophon } from "@/components/landing/colophon";
 import { Masthead } from "@/components/landing/masthead";
-import { demoEditions, getBriefById } from "@/content/local-lens-demo";
+import { demoEditions, getBriefById } from "@/content/public-wire-content";
 
 type BriefPageProps = {
   params: Promise<{ id: string }>;
@@ -21,12 +21,12 @@ export async function generateMetadata({ params }: BriefPageProps) {
 
   if (!brief) {
     return {
-      title: "Brief not found - LocalLens",
+      title: "Brief not found - PublicWire",
     };
   }
 
   return {
-    title: `${brief.headline} - LocalLens`,
+    title: `${brief.headline} - PublicWire`,
     description: brief.summary,
   };
 }

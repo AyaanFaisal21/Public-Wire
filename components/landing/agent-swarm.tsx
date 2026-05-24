@@ -79,7 +79,7 @@ export function AgentSwarm() {
             </h2>
           </div>
           <p className="text-lg md:text-2xl text-neutral-200 leading-snug font-light text-balance self-end max-w-2xl">
-            LocalLens uses a five-step chain: Nimble finds civic source material,
+            PublicWire uses a five-step chain: Nimble finds civic source material,
             ClickHouse records the audit trail, Gemini makes the editorial decision,
             Senso grounds the brief, and Datadog Lapdog traces the reliability layer.
           </p>

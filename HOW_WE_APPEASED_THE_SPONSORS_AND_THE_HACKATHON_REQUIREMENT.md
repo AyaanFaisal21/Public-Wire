@@ -1,6 +1,6 @@
 # How We Appeased the Sponsors and the Hackathon Requirement
 
-LocalLens is built around one sentence:
+PublicWire is built around one sentence:
 
 > An autonomous civic newsroom that checks public sources, decides what matters, verifies it, publishes it, and shows its work.
 
@@ -12,10 +12,10 @@ The hackathon requires at least two sponsor tools, each used meaningfully. We us
 
 The rubric: Autonomy · Idea · Technical Implementation · Tool Use · Presentation (20% each).
 
-| Axis | How LocalLens lands it |
+| Axis | How PublicWire lands it |
 |---|---|
 | **Autonomy** | Agents run before any user search. The 3-inquiry threshold detects user demand and triggers a brief without a prompt. Verifier resends weak claims for more evidence instead of publishing loosely. |
-| **Idea** | Civic information is technically public but functionally hidden. LocalLens turns scattered government output into a self-running local newspaper with a trust layer. Hits both ClickHouse prize lanes — "makes your life better" and "impact in our community." |
+| **Idea** | Civic information is technically public but functionally hidden. PublicWire turns scattered government output into a self-running local newspaper with a trust layer. Hits both ClickHouse prize lanes — "makes your life better" and "impact in our community." |
 | **Technical Implementation** | A swarm of narrow agents with a reviewable chain. Real Nimble extraction, real Senso publishing, real ClickHouse memory, Datadog-traced workflow. Falls back gracefully on missing credentials so the demo never breaks. |
 | **Tool Use** | 4 sponsor tools — each with a named role in the pipeline, multiple consuming agents, and at least two visible demo surfaces. |
 | **Presentation** | 3-minute demo lands the autonomy, the trust layer, the feedback loop, and a live brief generated from a 3-resident inquiry trigger. Each sponsor named on-screen during the Investigate modal. |
@@ -64,7 +64,7 @@ The rubric: Autonomy · Idea · Technical Implementation · Tool Use · Presenta
 - **Metrics strip** on the area page — `sourcesChecked`, `briefsPublished`, `rejectedItems` are all ClickHouse aggregations.
 
 **The sponsor moment**
-> *"Most AI news systems publish in a vacuum. LocalLens publishes against memory. When a claim shows up, ClickHouse tells the desk what it's seen before — and that's how the desk knows when a rumor is just a rumor we've seen before."*
+> *"Most AI news systems publish in a vacuum. PublicWire publishes against memory. When a claim shows up, ClickHouse tells the desk what it's seen before — and that's how the desk knows when a rumor is just a rumor we've seen before."*
 
 **Status**: 🟡 Client + connection logic exists with seeded fallback. Civic-memory schema and the three query helpers still to be added — highest-leverage build remaining.
 
@@ -95,7 +95,7 @@ The rubric: Autonomy · Idea · Technical Implementation · Tool Use · Presenta
 **Role**: Traces every agent step. The raw spans become the *"how this story was made"* public audit log — making autonomous publishing **inspectable** instead of mysterious.
 
 **Where in the system**
-- *(Wiring in progress.)* The trace surface in `runLocalLensScan()` is currently a hand-built event array; the next build replaces it with `ddtrace`'s LLMObs SDK — a `@workflow` decorator on the pipeline and a `@span` around each agent call.
+- *(Wiring in progress.)* The trace surface in `runPublicWireScan()` is currently a hand-built event array; the next build replaces it with `ddtrace`'s LLMObs SDK — a `@workflow` decorator on the pipeline and a `@span` around each agent call.
 - Once wired, every step (Source Scout → Extractor → Change Detector → Editor → Verifier → Writer → Mentor → Publisher → Audit Translator) becomes an explicit Datadog span with parent/child structure, input, output, and latency.
 
 **Demo-visible surfaces**

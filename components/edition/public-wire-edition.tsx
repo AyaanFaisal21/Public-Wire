@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { type CivicBrief, type LocalEditionDemo, getEditionBySlug } from "@/content/local-lens-demo";
+import { type CivicBrief, type PublicWireEdition, getEditionBySlug } from "@/content/public-wire-content";
 
 type Props = {
   areaSlug: string;
@@ -26,9 +26,9 @@ type CoverageNotification = {
   requestedTopic: string;
 };
 
-export function LocalEdition({ areaSlug, areaName, focus, initialQuery = "" }: Props) {
+export function PublicWireEdition({ areaSlug, areaName, focus, initialQuery = "" }: Props) {
   const fallbackEdition = getEditionBySlug(areaSlug);
-  const [edition, setEdition] = useState<LocalEditionDemo>(fallbackEdition);
+  const [edition, setEdition] = useState<PublicWireEdition>(fallbackEdition);
   const topBrief = edition.briefs[0] ?? fallbackEdition.briefs[0];
   const [selectedBrief, setSelectedBrief] = useState<CivicBrief | null>(null);
   const [requestOpen, setRequestOpen] = useState(false);
@@ -52,7 +52,7 @@ export function LocalEdition({ areaSlug, areaName, focus, initialQuery = "" }: P
     setLiveError(null);
 
     try {
-      const response = await fetch("/api/local-lens/edition", {
+      const response = await fetch("/api/public-wire/edition", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -86,9 +86,9 @@ export function LocalEdition({ areaSlug, areaName, focus, initialQuery = "" }: P
       <section className="border-b border-black/10">
         <div className="max-w-[1400px] mx-auto px-6 md:px-10 pt-16 md:pt-20 pb-12">
           <div className="flex items-baseline gap-3 mb-8 text-[0.7rem] md:text-xs uppercase tracking-[0.22em] text-neutral-500">
-            <span>LocalLens {edition.area || areaName}</span>
+            <span>PublicWire {edition.area || areaName}</span>
             <span className="flex-1 h-px bg-black/15 max-w-[200px]" />
-            <span>Live civic edition edition</span>
+            <span>Live civic edition</span>
           </div>
 
           <div className="grid lg:grid-cols-[1fr_380px] gap-8 lg:gap-14 items-end">
@@ -437,7 +437,7 @@ function CoverageRequestDialog({
     setRequestError(null);
 
     try {
-      const response = await fetch("/api/local-lens/coverage-request", {
+      const response = await fetch("/api/public-wire/coverage-request", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

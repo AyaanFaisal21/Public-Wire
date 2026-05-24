@@ -1,4 +1,4 @@
-import type { CivicBrief } from "@/lib/local-lens-data";
+import type { CivicBrief } from "@/lib/public-wire-data";
 
 type SensoPublishResult = {
   provider: "Senso";
@@ -37,7 +37,7 @@ export async function publishCivicBrief(params: {
 
   try {
     const query = [
-      "Verify and ground this LocalLens civic micro-brief using organization knowledge/context.",
+      "Verify and ground this PublicWire civic micro-brief using organization knowledge/context.",
       `Headline: ${params.brief.headline}`,
       `Area: ${params.brief.area}`,
       `Summary: ${params.brief.summary}`,
@@ -66,7 +66,7 @@ export async function publishCivicBrief(params: {
       provider: "Senso",
       mode: "real-api",
       purpose:
-        "Real Senso API call completed. Senso searched the LocalLens org context to ground the civic brief.",
+        "Real Senso API call completed. Senso searched the PublicWire org context to ground the civic brief.",
       publishedUrl: briefUrl,
       citationId: `senso_${params.brief.id}`,
       raw,
@@ -76,7 +76,7 @@ export async function publishCivicBrief(params: {
       provider: "Senso",
       mode: "api-error-fallback",
       purpose:
-        "Senso API call failed, so LocalLens kept the local cited brief artifact for demo continuity.",
+        "Senso API call failed, so PublicWire kept the local cited brief artifact for demo continuity.",
       publishedUrl: briefUrl,
       citationId: `fallback_${params.brief.id}`,
       error: String(error),

@@ -1,4 +1,4 @@
-import { localSources, seededChanges, type CivicBrief, type LocalChange, type LocalSource } from "./local-lens-data";
+import { localSources, seededChanges, type CivicBrief, type LocalChange, type LocalSource } from "./public-wire-data";
 import { logRecallFormRun } from "./clickhouse";
 import { nimbleRunCivicScan } from "./sponsors/nimble-civic";
 import { publishCivicBrief } from "./sponsors/senso-civic";
@@ -103,7 +103,7 @@ function sourcePacketForChange(change: LocalChange | undefined, sources: LocalSo
     url: source.url,
     role: change
       ? `Used as source context for "${change.title}".`
-      : "Used as source context for the live LocalLens scan.",
+      : "Used as source context for the live PublicWire scan.",
   }));
 }
 
@@ -122,7 +122,7 @@ function buildRequestedTopicChange(params: {
     category: "city-agenda",
     status: "new",
     importance: "resident-relevant",
-    whatChanged: `A user searched "${requestedTopic}" in ${area}. LocalLens opened a source-backed investigation before treating the claim as fact.`,
+    whatChanged: `A user searched "${requestedTopic}" in ${area}. PublicWire opened a source-backed investigation before treating the claim as fact.`,
     whyItMatters: `Local claims can spread faster than official confirmation. This search gives ${place} residents a way to separate demand, evidence, and unsupported claims.`,
     whoIsAffected: ["residents", "commuters", "families", "local businesses", "local officials"],
     evidence: [
@@ -200,7 +200,7 @@ function buildDynamicBrief(params: {
 }
 
 
-export async function runLocalLensScan(params?: {
+export async function runPublicWireScan(params?: {
   area?: string;
   slug?: string;
   focus?: string[];
