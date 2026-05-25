@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { runPublicWireScan } from "@/lib/public-wire-agent";
+import { requireAdmin } from "@/lib/public-wire-request-guard";
 
-export async function POST() {
+export async function POST(request: Request) {
+  const unauthorized = requireAdmin(request);
+  if (unauthorized) return unauthorized;
+
   try {
     const result = await runPublicWireScan();
     return NextResponse.json(result);
